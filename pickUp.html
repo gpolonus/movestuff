@@ -1,0 +1,123 @@
+<html>
+<head>
+	<style>
+	canvas
+	{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+		z-index: -3;
+	}
+	</style>
+</head>
+<body onkeydown="keyBooleans(), showKeyCode()" onkeyup="keyBooleans()">
+<div id="keyCodes"></div>
+<div id='div' style="border-radius:100px;background-color:red; position:absolute;width:100px;height:100px;" onmousedown="pickup()" onmouseup="putdown()" onmousemove="hold()" onmouseout="wentout()"></div>
+<script>
+
+var keys = new Array();
+for(i=1;i<150;i++)
+	keys[i] = false;
+var leftPX = 0;
+var topPX = 0;
+var speed = 2;
+
+function get(id)
+{
+	return document.getElementById(id);
+}
+
+var pickedup = false;
+function pickup()
+{
+	hold=holding;
+	pickedup = true;
+	topDif = event.clientY-topPX;
+	leftDif = event.clientX - leftPX;
+}
+
+function putdown()
+{
+	hold = nothing;
+	pickedup = false;
+	topPX = event.clientY-topDif;
+	leftPX = event.clientX-leftDif;
+	render();
+}
+
+function hold()
+{
+	nothing();
+}
+
+function holding()
+{
+	get("div").style.top = event.clientY-topDif;
+	get("div").style.left = event.clientX-leftDif;
+}
+
+function wentout()
+{
+	if(pickedup)
+		putdown();
+}
+
+function nothing(){}
+
+function showKeyCode()
+{
+	get("keyCodes").innerHTML = "<h1 style='color:blue;'>"+event.which+'</h1>';
+}
+
+function render()
+{
+
+	if(pickedup)
+		return false;
+	if(keys[65])
+	{
+		leftPX -= speed;
+	}
+	
+	if(keys[68])
+	{
+		leftPX += speed;
+	}
+	
+	if(keys[87])
+	{
+		topPX -= speed;
+	}
+	
+	if(keys[83])
+	{
+		topPX += speed;	
+	}
+	
+	// make the ball move
+	get("div").style.left = leftPX;
+	get("div").style.top = topPX;	
+
+	setTimeout(render,10);
+}
+render();
+
+function keyBooleans()
+{
+	// speed++;
+	if(event.type=="keydown")
+	{
+		keys[event.which] = true;
+	}
+
+	else if(event.type == "keyup")
+	{
+		keys[event.which] = false;		
+	}
+	// if(!(keyA || keyD || keyW || keyS))
+	// 	speed = 0;	
+}
+
+</script>
+</body>
+</html>

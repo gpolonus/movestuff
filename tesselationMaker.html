@@ -1,0 +1,244 @@
+<html>
+<head>
+<style>
+	#stuff
+	{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+		z-index: 5;
+	}
+
+	#canvas
+	{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+	}
+</style>
+</head>
+<body>
+<div id="stuff">
+	<button onclick="ctx.clearRect(0,0,pageWidth,pageHeight)">Clear Canvas</button><br>
+	<h1 id="printOut"></h1>
+</div>
+<canvas id="canvas" onmousemove="draw()" onmousedown="draw()" onmouseup="draw()"></canvas>
+<script src="canvasLibrary.js"></script>
+<script>
+var pageHeight = document.body.clientHeight;
+var pageWidth = document.body.clientWidth;
+var canvas = get("canvas");
+var ctx = canvas.getContext("2d");
+var holding = undefined;
+ctx.canvas.height = pageHeight;
+ctx.canvas.width = pageWidth;
+
+function get(id)
+{
+	return document.getElementById(id);	
+}
+
+function getClasses(clas)
+{
+	return document.getElementsByClassName(clas);
+}
+
+function Point(x,y)
+{
+	this.name = "Point";
+	// this.stationary = true;
+	this.x = x;
+	this.y = y;
+	this.prev = undefined;
+	this.next = undefined;
+
+	// this.inBewtween = function(point, mouseX, mouseY)
+	// {
+	// 	midX = (point.x + this.x)/2;
+	// 	midY = (point.y + this.y)/2;
+	// 	slope = (point.y - this.y)/(point.x - this.x);
+	// 	perpSlope = -1/slope;
+	// }
+
+	this.draw = function()
+	{
+		drawDiscatCenter(this.x, this.y, 10, "red");
+	}
+
+	this.inRadius = function(x,y)
+	{
+		return this.distanceFrom(x,y) < 10;
+	}
+
+	this.distanceFrom = function(x,y)
+	{
+		if(typeof x == "number")
+			return Math.sqrt(Math.pow(this.x - x, 2) + Math.pow(this.y - y, 2));
+		else
+			return Math.sqrt(Math.pow(this.x - x.x, 2) + Math.pow(this.y - x.y, 2));
+	}
+}
+
+function Line(x1,y1,x2,y2)
+{
+	this.head = new Point(x1,y1);
+	this.back = new Point(x2,y2);
+	this.back.prev = this.head;
+	this.head.next = this.back;
+	this.count = 1;
+
+	this.draw = function(startX, startY)
+	{
+		startX = startX == undefined ? this.head.x : startX;
+		startY = startY == undefined ? this.head.y : startY;
+		var offsetX = -1*this.head.x + startX;
+		var offsetY = -1*this.head.y + startY;
+		ctx.strokeStyle = "black";
+		ctx.lineWidth = 1;
+		// ctx.beginPath();
+		ctx.moveTo(this.head.x + offsetX, this.head.y + offsetY);
+		for(var temp = this.head.next; temp != undefined; temp = temp.next)
+			ctx.lineTo(temp.x + offsetX, temp.y + offsetY);
+		// ctx.closePath();
+		ctx.stroke();
+	}
+
+	this.addPoint = function(x,y)
+	{
+		var first = this.head;
+		var secon;
+		for(var node = this.head; node != undefined; node = node.next)
+			if(first.distanceFrom(x,y) > node.distanceFrom(x,y))
+				first = node;
+		if(first.next == undefined)
+			secon = first.prev;
+		else if(first.prev == undefined)
+			secon = first.next;
+		else if(lesser(first.next.x,first.x) < x && x < greater(first.next.x, first.x) && lesser(first.next.y,first.y) < y && y < greater(first.next.y, first.y))
+		{
+			secon = first.next;
+		}
+		else
+		{
+			secon = first;
+			first = first.prev;
+		}
+		p = new Point(x,y);
+		first.next = p;
+		p.prev = first;
+		secon.prev = p;
+		p.next = secon;
+	}
+
+	this.distanceToSegment = function(x,y) 
+	{
+		var first = this.head;
+		var secon;
+		for(var node = this.head; node != undefined; node = node.next)
+			if(first.distanceFrom(x,y) > node.distanceFrom(x,y))
+				first = node;
+		if(first.next == undefined)
+			secon = first.prev;
+		else if(first.prev == undefined)
+			secon = first.next;
+		else if(lesser(first.next.x,first.x) < x && x < greater(first.next.x, first.x) && lesser(first.next.y,first.y) < y && y < greater(first.next.y, first.y))
+		{
+			secon = first.next;
+		}
+		else
+		{
+			// secon = first;
+			// first = first.prev;
+			secon = first.prev;
+		}
+		// // Return minimum distance between line segment vw and point p
+		// var l2 = first.distanceFrom(secon);  // i.e. |w-v|^2 -  avoid a sqrt
+		// if (l2 == 0) return first.distanceFrom(x,y);   // v == w case
+		// // Consider the line extending the segment, parameterized as v + t (w - v).
+		// // We find projection of point p onto the line. 
+		// // It falls where t = [(p-v) . (w-v)] / |w-v|^2
+		// // var t = dot(p - v, w - v) / l2;
+		// var t = (x - first.x)*(secon.x - first.x) + (y - first.y)*(secon.y - first.y);
+		// if (t < 0) return first.distanceFrom(x,y);       // Beyond the 'v' end of the segment
+		// else if (t > 1) return secon.distanceFrom(x,y);  // Beyond the 'w' end of the segment
+		// var projectionx = first.x + t * (secon.x - first.x);  // Projection falls on the segment
+		// var projectiony = first.y + t * (secon.y - first.y);  // Projection falls on the segment
+		// return Math.sqrt(Math.pow(projectionx-x,2) + Math.pow(projectiony-y,2));
+		if(first.distanceFrom(x,y) > first.distanceFrom(secon) || secon.distanceFrom(x,y) > first.distanceFrom(secon))
+			return false;
+		var d = Math.abs((secon.y-first.y)*x - (secon.x - first.x)*y + secon.x*first.y - secon.y*first.x) / first.distanceFrom(secon);
+		ctx.moveTo(x,y);
+		ctx.lineTo(x + -1*(first.y-secon.y)/first.distanceFrom(secon)*d, y + (first.x-secon.x)/first.distanceFrom(secon)*d);
+		ctx.stroke();
+		return d;
+	}
+
+	this.which = function(x,y)
+	{
+		for(var node = this.head; node != undefined; node = node.next)
+			if(node.distanceFrom(x,y) < 10)
+				return node;
+		return undefined;
+	}
+}
+
+function lesser(x,y)
+{
+	return x > y ? y : x;
+}
+
+function greater(x,y)
+{
+	return x > y ? x : y;
+}
+
+var line = new Line(100,100,500,100);
+line.addPoint(200,200);
+
+function draw()
+{
+	whiteCanvas();
+	var x = event.x;
+	var y = event.y;
+	line.draw();
+	line.draw(100,300);
+	// line.draw(100,200);
+	printOut(line.distanceToSegment(event.x, event.y));
+	if(holding == undefined)
+	{
+		var node = line.which(x,y);
+		if(node != undefined)
+		{
+			node.draw();
+			if(event.type == "mousedown")
+				holding = node;
+		}
+		else if(line.distanceToSegment(event.x, event.y) < 10 && line.distanceToSegment(event.x, event.y))
+		{
+			if(event.type == "mousedown")
+				line.addPoint(event.x, event.y);
+
+			drawDiscatCenter(x,y,5,"blue");
+		}
+	}
+	else
+	{
+		holding.draw();
+		if(event.type != "mouseup")
+		{
+			holding.x = x;
+			holding.y = y;
+			printOut(holding.x+", "+holding.y);
+		}
+		else
+			holding = undefined;
+	}
+}
+
+function printOut(string)
+{
+	get("printOut").innerHTML = string;
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>
+	Get those darn colors!
+</title>
+</head>
+<body>
+<div id="formdiv">
+	<h1>Put in a url to a pic!</h1>
+	<form id="form">
+		<input type="text" name="url"><button type="button" onclick="getPic()">Get Pic!</button><br>
+		<input type="text" name="red"><input type="text" name="green"><input type="text" name="blue"><button type="button" onclick="getColor()">Get Color</button>
+		<h2 id="colorHeader"></h2>
+		<div id="colorDiv" style="width:500px;height:500px;background-color:black;"></div>
+	</form>
+</div>
+<img style="visibility:hidden;" id="hidden">
+<canvas id="canvas" onclick="getColor()" style="postition:absolute;"></canvas>
+<script src="colorFuns.js"></script>
+<script>
+var canvas = get("canvas");
+var ctx = canvas.getContext("2d");
+canvas.height = document.body.clientHeight-30;
+canvas.width = document.body.clientWidth-30;
+var imgData;
+var color = "#000";
+var form = get("form");
+
+function getImgData()
+{
+	imgData = ctx.getImageData(event.clientX,event.clientY,1,1);
+	form.red.value = imgData.data[0];
+	form.green.value = imgData.data[1];
+	form.blue.value = imgData.data[2];	
+}
+
+function getColor()
+{
+	color = rgb(form.red.value,form.green.value,form.blue.value);
+	get("colorHeader").innerText = color;
+	get("colorDiv").style.backgroundColor = color;
+}
+
+function getPic()
+{
+	get("hidden").setAttribute("src",form.url.value);
+	img = get("hidden");
+	img.crossOrigin="anonymous";
+	ctx.drawImage(img,0,0);
+}
+
+function get(id)
+{
+	return document.getElementById(id);
+}
+</script>
+</body>
+</html>

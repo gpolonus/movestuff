@@ -1,0 +1,183 @@
+<html>
+<head>
+<style>
+	#stuff
+	{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+		z-index: 5;
+	}
+
+	#canvas
+	{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+	}
+</style>
+<title>GRJF`S TESTING PAGE</title>
+<link rel="icon" type="image/ico" href="freak.ico" />
+</head>
+<body onkeydown="keyBooleans()" onkeyup="keyBooleans()" onmousedown="keyBooleans()" onmousemove="keyBooleans()">
+<div id="stuff">
+	SHIT
+	<!-- <button onclick="ctx.clearRect(0,0,pageWidth,pageHeight)">Clear Canvas</button><br> -->
+</div>
+<canvas id="canvas"></canvas>
+<script src="canvasLibrary.js"></script>
+<script src="colorFuns.js"></script> 
+<script>
+var pageHeight = document.body.clientHeight;
+var pageWidth = document.body.clientWidth;
+var canvas = get("canvas");
+var ctx = canvas.getContext("2d");
+ctx.canvas.height = pageHeight;
+ctx.canvas.width = pageWidth;
+var keys = [];
+var mouseX = 0;
+var mouseY = 0;
+var stopped = false;
+blackCanvas();
+ctx.strokeStyle = "white";
+ctx.lineWidth = 3;
+
+function get(id)
+{
+	return document.getElementById(id);	
+}
+
+function getClasses(clas)
+{
+	return document.getElementsByClassName(clas);
+}
+
+var pon = [];
+var num = 22;
+var radius = 200;
+var controlRadius = 50;
+var controlRadius2= controlRadius;
+for(var i = 0; i < num; i++)
+{
+	pon.push({x: radius*Math.cos(i*2*Math.PI/num) + pageWidth/2 , y: -1*radius*Math.sin(i*2*Math.PI/num) + pageHeight/2});
+	pon[i].x0 = pon[i].x - controlRadius*Math.sin(i*Math.PI*2/num);
+	pon[i].y0 = pon[i].y - controlRadius*Math.cos(i*Math.PI*2/num);
+}
+
+function drawAll()
+{
+	blackCanvas();
+	// var grad = ctx.createRadialGradient(pageWidth/2, pageHeight/2,0, pageWidth/2, pageHeight/2, Math.sqrt(Math.pow(pon[0].x,2)+Math.pow(pon[0].y,2)));
+	var grad = ctx.createRadialGradient(pageWidth/2, pageHeight/2,0, pageWidth/2, pageHeight/2, 200);
+	grad.addColorStop(0,"white");
+	grad.addColorStop(1,"black");
+	ctx.fillStyle = grad;
+	ctx.strokeStyle = grad;
+	for(var i = 0; i < num; i++)
+	{
+		ctx.beginPath();
+		ctx.moveTo(pon[i].x, pon[i].y);
+		ctx.bezierCurveTo(pon[i].x0, pon[i].y0, pon[(i+1)%num].x*2 - pon[(i+1)%num].x0, pon[(i+1)%num].y*2 -  pon[(i+1)%num].y0, pon[(i+1)%num].x, pon[(i+1)%num].y );
+		ctx.stroke();
+		// ctx.fill();
+		if(1==2)
+		{
+			drawDiscatCenter(pon[i].x, pon[i].y, 10, "red");
+			drawDiscatCenter(pon[i].x0, pon[i].y0, 10, "blue");
+			drawDiscatCenter(pon[i].x*2 - pon[i].x0, pon[i].y*2 - pon[i].y0, 10, "green");
+		}
+	}
+}
+
+function keyBooleans()
+{
+	// speed++;
+	if(event.type=="keydown")
+	{
+		keys[event.which] = true;
+	}
+
+	else if(event.type == "keyup")
+	{
+		keys[event.which] = false;		
+	}
+
+	// else if(event.type == "mousedown")
+	// 	keys["mousedown"] = true;
+
+	// else if(event.type == "mouseup")
+	// 	keys["mousedown"] = false;
+	else if(event.type == "mousemove")
+	{
+		mouseX = event.x;
+		mouseY = event.y;
+	}
+ else if(event.type == "mousedown")
+ 	{
+ 		for(var i = 0; i < num; i++)
+ 		{
+ 			pon[i].x0 = event.x + 200*Math.cos(i*Math.PI/num*2) - controlRadius*Math.sin(i*Math.PI*2/num); ;
+    		pon[i].y0 = event.y - 200*Math.sin(i*Math.PI/num*2) - controlRadius*Math.cos(i*Math.PI*2/num); ;
+ 		}
+ 	}
+}
+
+var direction = true;
+var cl = {x: pageWidth/2 , y: pageHeight/2}
+function render()
+{
+	if(!stopped)
+	{
+		 var dist = distance(pageWidth/2, pageHeight/2, pon[0].x, pon[0].y);
+			if(dist > 500)
+				direction = !direction;
+		for(var i = 0; i < num; i++)
+		{
+			//pon[i].x0 = pageWidth/2 + 200*Math.cos(Math.PI/num*i*2 + (500-dist)/250*Math.PI);
+			//pon[i].y0 = pageHeight/2+ 400*Math.sin(Math.PI/num*i*2 + (500-dist)/250*Math.PI);
+			if(i%2 == 0)
+			{
+				if(direction)
+				{
+					 pon[i].x += Math.cos(i*2*Math.PI/num);
+					 pon[i].y -= Math.sin(i*2*Math.PI/num);
+				}
+				else
+				{
+					 pon[i].x -= Math.cos(i*2*Math.PI/num);
+					 pon[i].y += Math.sin(i*2*Math.PI/num);
+				}
+			}
+			else
+			{
+				if(!direction)
+				{
+					 pon[i].x += Math.cos(i*2*Math.PI/num);
+					 pon[i].y -= Math.sin(i*2*Math.PI/num);
+				}
+				else
+				{
+					 pon[i].x -= Math.cos(i*2*Math.PI/num);
+					 pon[i].y += Math.sin(i*2*Math.PI/num);
+				}
+			}
+		}
+	}
+	else
+	{
+
+  }
+
+	drawAll();
+	setTimeout(render,10);
+}
+render();
+
+
+function distance(x0,y0,x1,y1)
+{
+	return Math.sqrt(Math.pow(x0-x1,2)+Math.pow(y0-y1,2));
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<html>
+<head>
+<title>RANDOM PATHS</title>
+<style>
+	#stuff
+	{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+		z-index: 5;
+	}
+
+	#canvas
+	{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+	}
+</style>
+</head>
+<body>
+<!-- <div id="stuff">
+	<button onclick="ctx.clearRect(0,0,pageWidth,pageHeight)">Clear Canvas</button><br>
+</div> -->
+<canvas id="canvas"></canvas>
+<script src="canvasLibrary.js"></script>
+<script src="colorFuns.js"></script>
+<script>
+var pageHeight = document.body.clientHeight;
+var pageWidth = document.body.clientWidth;
+var canvas = get("canvas");
+var ctx = canvas.getContext("2d");
+ctx.canvas.height = pageHeight;
+ctx.canvas.width = pageWidth;
+var color = randomColor();
+
+
+function get(id)
+{
+	return document.getElementById(id);	
+}
+
+function Mouse()
+{
+	this.x = 0;
+	this.y = pageHeight/2;
+
+	this.drawMouse = function()
+	{
+		drawDiscatCenter(this.x,this.y,3,color);
+	}
+
+	this.moveNext = function()
+	{
+		switch(Math.floor(Math.random()*5))
+		{
+			case 0:
+				this.y+=5;
+			break;
+			case 1:
+				this.y+=5;
+				this.x+=5;
+			break;
+			case 2:
+				this.x+=5;
+			break;
+			case 3:
+				this.x+=5;
+				this.y-=5;
+			break;
+			case 4:
+				this.y-=5;
+			break;
+		}	
+	}
+
+	this.backwards = function()
+	{
+		switch(Math.floor(Math.random()*5))
+		{
+			case 0:
+				this.y+=5;
+			break;
+			case 1:
+				this.y+=5;
+				this.x-=5;
+			break;
+			case 2:
+				this.x-=5;
+			break;
+			case 3:
+				this.x-=5;
+				this.y-=5;
+			break;
+			case 4:
+				this.y-=5;
+			break;
+		}	
+	}
+}
+
+var mouse1 = new Mouse();
+var mouse2 = new Mouse();
+drawRectangle(0,0,pageWidth,pageHeight,"black");
+function run()
+{
+	if(mouse2.x > 0 && mouse1.x < pageWidth)
+	{
+		mouse1.moveNext();
+		mouse1.drawMouse();
+		mouse2.backwards();
+		mouse2.drawMouse();
+	}
+	else
+	{
+		mouse1 = new Mouse();
+		mouse2 = new Mouse();
+		mouse2.x = pageWidth;
+		mouse1.y = Math.floor(Math.random()*pageHeight);
+		mouse1.y = mouse1.y-mouse1.y%5;
+		mouse2.y = Math.floor(Math.random()*pageHeight);
+		mouse1.y = mouse2.y-mouse2.y%5;
+		color = randomColor();
+	}
+	setTimeout(run,1);
+}
+run();
+</script>
+</body>
+</html>

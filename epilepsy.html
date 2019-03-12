@@ -1,0 +1,40 @@
+<html>
+<head>
+<title>WATCH AT YOUR OWN RISK</title>
+<style>
+#p
+{
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	width: 500px;
+	height: 500px;
+	border-width: 3px;
+	border-style: solid;
+	border-color: black;
+}
+</style>
+<script src="move.js"></script>
+</head>
+<body>
+<div id="outer"></div>
+<div id="p"></div>
+<form><input type="text" name="num" placeholder="How many!?!?"></form>
+<script>
+i=0;
+outer = document.getElementById("outer");
+while(i<=50)
+{
+	x = Math.round(Math.random()*500+1);
+	y = Math.round(Math.random()*500+1);
+
+	outer.innerHTML += "<div class='inner' style='height:"+(Math.round(Math.random()*500+1))+";width:"+(Math.round(Math.random()*500+1))+";position:absolute;'></div>";
+	inner = new Array();
+	inner[i] = document.getElementsByClassName("inner")[i];
+	inner[i].style.zIndex = (-(inner[i].getAttribute('width') * inner[i].getAttribute('height')));
+	move(inner[i], Math.round(Math.random()*500+1), Math.round(Math.random()*500+1), 0, 0, 500, 500);
+	i++;
+}
+</script>
+</body>
+</html>

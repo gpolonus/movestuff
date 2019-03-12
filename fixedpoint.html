@@ -1,0 +1,49 @@
+<html>
+<head>
+<title>
+Fixed Point Iteration
+</title>
+</head>
+<body>
+<a onclick="bisect()">Bisect</a>
+<div id="div"></div>
+<script>
+var div = document.getElementById("div");
+var fofp;
+var gofp;
+var actual;
+var error;
+
+// actual = 1.4987011;
+error = Math.pow(10,-5);
+
+function equ(q)
+{
+	return Math.cos(q);
+}
+
+i=0;
+j=0;
+// gofp0 = 2.5;
+gofp0 = 0.74;
+var gofp1;
+div.innerHTML += j + "<br>" + gofp0 + "<br>";
+
+while(i==0)
+{
+	j++;
+	gofp1 = equ(gofp0);
+
+	div.innerHTML += j + "<br>" + gofp1 + "<br>";
+	if(Math.abs(gofp0 - gofp1) <= error || j>=100)
+	{
+		i++;
+	}
+	gofp0 = gofp1;
+}
+
+	// div.innerHTML += "<br><br><br>" + equ(equ(equ(equ(2.5))));
+
+</script>
+</body>
+</html>

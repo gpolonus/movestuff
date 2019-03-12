@@ -1,0 +1,72 @@
+<HTML>
+<HEAD>
+<TITLE>Enhanced Cursor</TITLE>
+</HEAD>
+<!-- <BODY onmousemove="enhancecursor();" > -->
+<BODY onmousedown="enhancecursor();" >
+<DIV ID="cursorplus" style="position:absolute;top:10;left:10;height:20;width:20;background-color:red"></DIV>
+</BODY>
+<SCRIPT>
+var cursorplus = document.getElementById("cursorplus");
+var i = 0;
+function enhancecursor() {
+	i++;
+	cursorplus.style.left=event.clientX-10;
+	cursorplus.style.top=event.clientY-10;
+	cursorplus.innerHTML = i;
+}
+
+function dectoBinary(integer)
+{
+	string = "";
+	power = Math.floor(Math.log(integer)/Math.log(2));
+	num = integer;
+	while(num != 0)
+	{
+		if(num >= Math.pow(2,power))
+		{
+			num -= Math.pow(2,power);
+			string += 1;
+		}
+		else
+			string += 0;
+		power--;
+	}
+	for(i=0;i<power+1;i++)
+	{
+		string+=0;
+	}
+	return string;
+}
+
+function binToDec(string)
+{
+	integer = 0;
+	for(i = 0; i < string.length; i++)
+	// for(i = string.length-1; i >= 0; i--)
+	{
+		integer += (1*string.charAt(i))*Math.pow(2,string.length - i-1);
+	}
+	return integer;
+}
+
+function getBit(num, place)
+{
+	if(Math.pow(2,place) > num)
+		return 0;
+	else
+		return num%Math.pow(2,place+1)-(Math.pow(2,place)) >= 0 ? 1 : 0;
+}
+
+function doNumber(num)
+{
+	string = "";
+	log = Math.floor(Math.log(num)/Math.log(2))+1;
+	for(i = 0 ; i < log; i++)
+	{
+		string = getBit(num,i)+string;
+	}
+	return string;
+}
+</SCRIPT>
+</HTML>

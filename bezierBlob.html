@@ -1,0 +1,125 @@
+<html>
+<head>
+<style>
+	#stuff
+	{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+		z-index: 5;
+	}
+
+	#canvas
+	{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+	}
+
+	*
+	{
+		font-family: Courier New;
+	}
+</style>
+<title>GRJF`S TESTING PAGE</title>
+<link rel="icon" type="image/ico" href="freak.ico" />
+</head>
+<body>
+<div id="stuff">
+	Lines:<input type="checkbox" id="check" checked><br>
+	Control Length:<input type="number" id="controlLength" value="100"><br>
+	Point Radius:<input tyep="number" id="radius" value="200"><br>
+	<button id="inch" onclick="stopped = true, draw()">Single Frame</button><br>
+	<button id="stop" onclick="stop()" disabled>Stop</button><br>
+	<button id="start" onclick="start()">Start</button><br>
+</div>
+<canvas id="canvas"></canvas>
+<script src="canvasLibrary.js"></script>
+<script>
+var pageHeight = document.body.clientHeight;
+var pageWidth = document.body.clientWidth;
+var canvas = get("canvas");
+var ctx = canvas.getContext("2d");
+ctx.canvas.height = pageHeight;
+ctx.canvas.width = pageWidth;
+ctx.strokeStyle = "black";
+ctx.lineWidth = 3;
+ctx.fillStyle = "red";
+var stopped = false;
+var points = [];
+var num = 6;
+
+function get(id)
+{
+	return document.getElementById(id);	
+}
+
+function getClasses(clas)
+{
+	return document.getElementsByClassName(clas);
+}
+
+function start()
+{
+	get("stop").disabled = false;
+	get("start").disabled = true;
+	if(points.length == 0)
+	{
+		for(var i = 0; i < num; i++)
+			points.push({x: get("radius").value*Math.cos(i*2*Math.PI/num) + pageWidth/2 ,y: get("radius").value*Math.sin(i*2*Math.PI/num) + pageHeight/2 , x0: -1*get("controlLength").value*Math.cos(i*2*Math.PI/num + Math.PI/2) + get("radius").value*Math.cos(i*2*Math.PI/num) + pageWidth/2 , y0: -1*get("controlLength").value*Math.sin(i*2*Math.PI/num + Math.PI/2) + get("radius").value*Math.sin(i*2*Math.PI/num) + pageHeight/2 });
+	}
+	draw();
+}
+
+function stop()
+{
+	stopped = true;
+	get("start").disabled = false;
+	get("stop").disabled = true;
+}
+
+
+
+
+function draw()
+{
+	whiteCanvas();
+	ctx.strokeStyle = "gray";
+	for(p in points)
+	{
+		points[p].x  += Math.round(Math.random()*2)-1;
+		points[p].y  += Math.round(Math.random()*2)-1;
+		points[p].x0 += Math.round(Math.random()*2)-1;
+		points[p].y0 += Math.round(Math.random()*2)-1;
+		if(get("check").checked)
+		{
+			drawDiscatCenter(points[p].x, points[p].y, 10, "red");
+			drawDiscatCenter(points[p].x0, points[p].y0, 10 , "blue");
+			drawDiscatCenter(points[p].x*2-points[p].x0, points[p].y*2-points[p].y0, 10 , "green");
+			ctx.beginPath();
+			ctx.moveTo(points[p].x0, points[p].y0);
+			ctx.lineTo(points[p].x*2-points[p].x0, points[p].y*2-points[p].y0);
+			ctx.closePath();
+			ctx.stroke();
+		}
+	}
+
+	ctx.strokeStyle = "black";
+	ctx.beginPath();
+	for(var p = 0; p < points.length; p++)
+	{
+		ctx.moveTo(points[p].x, points[p].y);
+		ctx.bezierCurveTo(points[p].x*2 - points[p].x0, points[p].y*2 - points[p].y0, points[(p+1)%num].x0, points[(p+1)%num].y0, points[(p+1)%num].x, points[(p+1)%num].y);
+	}
+	ctx.stroke();
+
+	if(!stopped)
+	{
+		setTimeout(draw, 1);
+	}
+	else
+		stopped = false;
+}
+</script>
+</body>
+</html>

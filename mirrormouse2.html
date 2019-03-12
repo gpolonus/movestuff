@@ -1,0 +1,151 @@
+<html>
+<head>
+<style>
+	#stuff
+	{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+		z-index: 5;
+	}
+
+	#canvas
+	{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+	}
+</style>
+<title>GRJF`S TESTING PAGE</title>
+<link rel="icon" type="image/ico" href="freak.ico" />
+</head>
+<body onkeydown="keyBooleans()" onkeyup="keyBooleans()" onmousedown="keyBooleans()" onmousemove="keyBooleans()" onmouseup="keyBooleans()">
+<div id="stuff">
+	<!-- <button onclick="ctx.clearRect(0,0,pageWidth,pageHeight)">Clear Canvas</button><br> -->
+	<form id="form" action="saveCanvas.php" method="post"><input type="hidden" name="picture"><button type="button" onclick="save()">Save Canvas</button></form>
+</div>
+<canvas id="canvas"></canvas>
+<script src="canvasLibrary.js"></script>
+<script src="colorFuns.js"></script>
+<script>
+var pageHeight = document.body.clientHeight;
+var pageWidth = document.body.clientWidth;
+var canvas = get("canvas");
+var ctx = canvas.getContext("2d");
+ctx.canvas.height = pageHeight;
+ctx.canvas.width = pageWidth;
+var keys = [];
+var mouseX = 0;
+var mouseY = 0;
+var clicking = false;
+var prevPoints = [];
+var first = true;
+ctx.strokeStyle = "white";
+drawAll();
+blackCanvas();
+
+function get(id)
+{
+	return document.getElementById(id);	
+}
+
+function getClasses(clas)
+{
+	return document.getElementsByClassName(clas);
+}
+
+function save()
+{
+	get("form").picture.value = canvas.toDataURL();
+	get("form").submit();
+}
+
+function drawAll()
+{
+	if(first)
+	{
+		prevPoints = [];
+		prevPoints.push({x: mouseX, y: mouseY});
+		prevPoints.push({x: pageWidth - mouseX, y: mouseY});
+		prevPoints.push({x: pageWidth - mouseX, y: pageHeight - mouseY});
+		prevPoints.push({x: mouseX, y: pageHeight - mouseY});
+		
+		// first = false;
+	}
+	else
+	{
+		var points = [];
+		points.push({x: mouseX, y: mouseY});
+		points.push({x: pageWidth - mouseX, y: mouseY});
+		points.push({x: pageWidth - mouseX, y: pageHeight - mouseY});
+		points.push({x: mouseX, y: pageHeight - mouseY});
+
+		drawLine(points[0], prevPoints[0]);
+		drawLine(points[1], prevPoints[1]);
+		drawLine(points[2], prevPoints[2]);
+		drawLine(points[3], prevPoints[3]);
+
+		prevPoints = points;
+	}
+}
+
+function drawLine(first, second)
+{
+	ctx.beginPath();
+	ctx.moveTo(first.x, first.y);
+	ctx.lineTo(second.x, second.y);
+	ctx.stroke();
+}
+
+function keyBooleans()
+{
+	// speed++;
+	if(event.type=="keydown")
+	{
+		keys[event.which] = true;
+	}
+
+	else if(event.type == "keyup")
+	{
+		keys[event.which] = false;		
+	}
+
+	// else if(event.type == "mousedown")
+	// 	keys["mousedown"] = true;
+
+	// else if(event.type == "mouseup")
+	// 	keys["mousedown"] = false;
+	else if(event.type == "mousemove")
+	{
+		mouseX = event.x;
+		mouseY = event.y;
+	}
+	else if(event.type == "mousedown")
+	{
+		first = !first;
+	}
+	else if(event.type == "mouseup")
+	{
+		first = !first;
+	}
+}
+
+function render()
+{
+	// if(!stopped)
+	// {
+
+	// }
+	// else
+	// {
+
+	// }
+
+	drawAll();
+	setTimeout(render,10);
+}
+render();
+
+</script>
+</body>
+</html>

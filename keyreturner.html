@@ -1,0 +1,14 @@
+<html>
+<head>
+<title>KeyCode Checker</title>
+</head>
+<body onkeydown="keydown(event)">
+<h1>Press a key!</h1>
+<script>
+function keydown(e)
+{
+	document.getElementsByTagName('h1')[0].innerHTML = e.keyCode;
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+color based on x and y movement
+
+slowing blue change
+
+color based on instantaneous speed
+
+red/green spacial, blue speed

@@ -1,0 +1,161 @@
+<html>
+<head>
+<title>REPEAT THE PATTERN GAME</title>
+<style>
+div#n0
+{
+	position: absolute;
+	background-color: #0f0;
+	width: 200px;
+	height: 200px;
+}
+
+div#n1
+{
+	position: absolute;
+	background-color: #f0f;
+	width: 200px;
+	height: 200px;
+}
+
+body
+{
+	background-color: black;
+}
+
+h1
+{
+	color: #fff;
+}
+
+*
+{
+	font-family: Comic Sans MS;
+}
+</style>
+</head>
+<body onload="start(), movel()">
+<h1>
+</h1>
+<div id="n0" onclick="repeating(0)"></div>
+<div id="n1" onclick="repeating(1)"></div>
+<div style="position:absolute;color:white;top:0px;left:100px;">0</div>
+<div style="position:absolute;color:white;top:100px;left:100px;">1000</div>
+<div style="position:absolute;color:white;top:200px;left:100px;">2000</div>
+<div style="position:absolute;color:white;top:300px;left:100px;">3000</div>
+<div style="position:absolute;color:white;top:400px;left:100px;">4000</div>
+<div id="tred" style="position:absolute;top:0px;left:100px;background-color:red;width:10px;height:10px;"></div>
+<script>
+var tp = 0;
+function movel()
+{
+	tp++;
+	document.getElementById('tred').style.top = tp + "px";
+	setTimeout(movel(), 10);
+}
+
+var n0 = document.getElementById("n0");
+var n1 = document.getElementById("n1");
+var head = document.getElementsByTagName("h1")[0];
+
+n0.style.top = "100px";
+n1.style.top = "100px";
+
+n0.style.left = document.body.clientWidth/2 - 250 + "px";
+n1.style.left = document.body.clientWidth/2 + 50 + "px";
+
+var i = 0;
+var clicked;
+sequence = new Array();
+sequence[0] = Math.round(Math.random());
+
+function start()
+{
+	i = 0;	
+	setTimeout(function(){
+		head.innerHTML = "Begin";
+		setTimeout(function(){
+			head.innerHTML += " 1,";
+			setTimeout(function(){
+				head.innerHTML += " 2,";
+				setTimeout(function(){
+					head.innerHTML += " 3";
+					setTimeout(play,1000);
+},1000);
+},1000);
+},1000);
+},1000);
+	
+	
+	
+	
+	// head.innerHTML += "REPEAT THAT SEQUENCE!";
+	clicked = 0;
+}
+
+function play()
+{
+	if(i<sequence.length)
+	{
+		setTimeout(function() {lightup(sequence[i]);setTimeout(play, 1500);} ,1000);	
+	}
+}
+
+function lightup(l)
+{
+	// alert(sequence[i]);
+	// if(l == 0)
+	// {
+		document.getElementsByTagName("div")[i].style.backgroundColor = "#ccc";
+	// }
+	// else if(l == 1)
+	// {
+	// 	n1.style.backgroundColor = "#ccc";
+	// }
+	setTimeout(lightdown(sequence[i]),1000);
+}
+
+function lightdown(j)
+{
+	if(j == 0)
+	{
+		n0.style.backgroundColor = "#0f0";
+	}
+	else if(j == 1)
+	{
+		n1.style.backgroundColor = "#f0f";
+	}
+	i++;
+}
+
+function repeating(j)
+{
+	clicked++;
+	
+	lightup(j);
+
+	if(sequence[clicked-1] != j)
+	{
+		head.innerHTML = "WRONG! Freshen Page to startover";
+		n0.style.visibility = "hidden";
+		n1.style.visibility = "hidden";
+	}
+
+	else
+	{
+		if(clicked < sequence.length)
+		{
+			head.innerHTML = "Keep going...";
+		}
+		else
+		{
+			head.innerHTML = "CORRECT!";
+			noo = sequence.length;
+			sequence[noo] = Math.round(Math.random());
+			setTimeout(start, 1000);
+		}
+	}		
+}
+</script>
+</body>
+</html>

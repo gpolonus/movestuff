@@ -1,0 +1,161 @@
+<html>
+<head>
+<style>
+	#stuff
+	{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+		z-index: 5;
+	}
+
+	#canvas
+	{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+	}
+</style>
+<title>GRJF`S TESTING PAGE</title>
+<link rel="icon" type="image/ico" href="freak.ico" />
+</head>
+<body>
+<div id="stuff">
+	<button onclick="ctx.clearRect(0,0,pageWidth,pageHeight)">Clear Canvas</button><br>
+</div>
+<canvas id="canvas"></canvas>
+<script src="canvasLibrary.js"></script>
+<script>
+var pageHeight = document.body.clientHeight;
+var pageWidth = document.body.clientWidth;
+var canvas = get("canvas");
+var ctx = canvas.getContext("2d");
+ctx.canvas.height = pageHeight;
+ctx.canvas.width = pageWidth;
+ctx.lineWidth = 3;
+ctx.strokeStyle = "black";
+
+function get(id)
+{
+	return document.getElementById(id);	
+}
+
+function getClasses(clas)
+{
+	return document.getElementsByClassName(clas);
+}
+
+
+var outerLines = [];
+
+function OuterLine()
+{
+	// this.p_i = [{x:0,y:0},{x:0,y:0},{x:0,y:0},{x:0,y:0}];
+	this.p = [{x:0,y:0},{x:0,y:0},{x:0,y:0},{x:0,y:0}];
+	this.increment = 6;
+	this.t = undefined;
+	this.intersection = undefined;
+
+	this.drawNext = function()
+	{
+		if(this.intersection != undefined)
+		{
+			if(this.t > 0.5)
+			{
+				this.t -= 0.04;
+				if(this.t < 0.5)
+					return;
+				var derivative = getBezierDerivative(this, this.t);
+				var point = getPointOnBezier(this, this.t);
+				this.intersection.p[0].x = point.x;
+				this.intersection.p[0].y = point.y;
+				this.intersection.p[1] = {x: Math.cos(Math.atan(derivative)+Math.PI/2)*this.increment+point.x, y: Math.cos(Math.atan(derivative)+Math.PI/2)*this.increment+point.y};
+				this.intersection.p[2] = {x: this.intersection.p[2].x + this.increment, y: this.intersection.p[2].y + this.increment};
+				this.intersection.p[3].x += this.increment;
+				ctx.beginPath();
+				ctx.moveTo(this.intersection.p[0].x, this.intersection.p[0].y);
+				ctx.bezierCurveTo(this.intersection.p[1].x, this.intersection.p[1].y, this.intersection.p[2].x, this.intersection.p[2].y, this.intersection.p[3].x, this.intersection.p[3].y);
+				ctx.stroke();
+				ctx.closePath();
+			}
+			else if(this.t < 0.5)
+			{
+				this.t += 0.04;
+				if(this.t > 0.5)
+					return;
+				var derivative = getBezierDerivative(this, this.t);
+				var point = getPointOnBezier(this, this.t);
+				this.intersection.p[0].x -= this.increment;
+				this.intersection.p[1] = {x: this.intersection.p[1].x - this.increment, y: this.intersection.p[1].y + this.increment};
+				this.intersection.p[2] = {x: this.intersection.p[3].x - point.x + this.intersection.p[2].x, y: -1*this.intersection.p[3].y + point.y + this.intersection.p[2].y};
+				this.intersection.p[3].x = point.x;
+				this.intersection.p[3].y = point.y;
+				ctx.beginPath();
+				ctx.moveTo(this.intersection.p[0].x, this.intersection.p[0].y);
+				ctx.bezierCurveTo(this.intersection.p[1].x, this.intersection.p[1].y, this.intersection.p[2].x, this.intersection.p[2].y, this.intersection.p[3].x, this.intersection.p[3].y);
+				ctx.stroke();
+				ctx.closePath();
+			}
+		}
+		else if(Math.floor(Math.random()*50) == 1)
+		{
+			this.intersection = new OuterLine();
+			// outerLines.push(this.intersection);
+			this.t = Math.random();
+			while(this.t == 0.5)
+				this.t = Math.random();
+			var point = getPointOnBezier(this, this.t);
+			var derivative = getBezierDerivative(this, this.t);
+			if(this.t > 0.5)
+				this.intersection.p = [{x: point.x, y: point.y}, {x: Math.sqrt(this.increment*this.increment / (1 + 1 / (derivative*derivative)))+point.x, y: Math.sqrt(this.increment*this.increment / (1 + (derivative*derivative)))+point.y}, {x: this.p[3]+this.increment, y: this.increment}, {x: this.p[3]+this.increment, y: 0}];
+			else if(this.t < 0.5)
+				this.intersection.p = [{x: this.p[0].x - this.increment, y: 0}, {x: this.p[0].x-this.increment, y: this.increment}, {x: Math.sqrt(this.increment*this.increment / (1 + 1 / (derivative*derivative)))+point.x, y: Math.sqrt(this.increment*this.increment / (1 + (derivative*derivative)))+point.y}, {x: point.x, y: point.y}];
+			ctx.beginPath();
+			ctx.moveTo(this.intersection.p[0].x, this.intersection.p[0].y);
+			ctx.bezierCurveTo(this.intersection.p[1].x, this.intersection.p[1].y, this.intersection.p[2].x, this.intersection.p[2].y, this.intersection.p[3].x, this.intersection.p[3].y);
+			ctx.stroke();
+			ctx.closePath();
+		}
+		else if(this.intersection == undefined)
+		{
+			this.p[0].x -= this.increment;
+			this.p[1] = {x: this.p[1].x - this.increment, y: this.p[1].y + this.increment};
+			this.p[2] = {x: this.p[2].x + this.increment, y: this.p[2].y + this.increment};
+			this.p[3].x += this.increment;
+			ctx.beginPath();
+			ctx.moveTo(this.p[0].x, this.p[0].y);
+			ctx.bezierCurveTo(this.p[1].x, this.p[1].y, this.p[2].x, this.p[2].y, this.p[3].x, this.p[3].y);
+			ctx.stroke();
+			ctx.closePath();
+		}
+	};
+}
+
+outerLines.push(new OuterLine());
+outerLines[0].p = [{x:pageWidth/2-100,y:0},{x:pageWidth/2-100,y:100},{x:pageWidth/2+100,y:100},{x:pageWidth/2+100,y:0}];
+drawOuter();
+
+function drawOuter()
+{
+	var i = 100;
+	function draw()
+	{
+		outerLines[0].drawNext();
+		if(i-- > 0)
+			setTimeout(draw, 10);
+	}
+	draw();
+}
+
+function getPointOnBezier(outer, t)
+{
+	return {x: Math.pow((1-t),3)*outer.p[0].x + 3*Math.pow((1-t),2)*t*outer.p[1].x + 3*(1-t)*t*t*outer.p[2].x + t*t*t*outer.p[3].x, y: Math.pow((1-t),3)*outer.p[0].y + 3*Math.pow((1-t),2)*t*outer.p[1].y + 3*(1-t)*t*t*outer.p[2].y + t*t*t*outer.p[3].y};
+}
+
+function getBezierDerivative(outer, t)
+{
+	return (3*Math.pow((1-t),2)*(outer.p[1].y-outer.p[0].y) + 6*(1-t)*t*(outer.p[2].y-outer.p[1].y) + 3*t*t*(outer.p[3].y-outer.p[2].y)) / (3*Math.pow((1-t),2)*(outer.p[1].x-outer.p[0].x) + 6*(1-t)*t*(outer.p[2].x-outer.p[1].x) + 3*t*t*(outer.p[3].x-outer.p[2].x));
+}
+</script>
+</body>
+</html>

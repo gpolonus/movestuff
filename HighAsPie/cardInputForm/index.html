@@ -1,0 +1,77 @@
+<html>
+<head>
+	<title>THE FORM FOR PUTTING IN CARDS</title>
+	<script src="cards.js"></script>
+</head>
+<body>
+<h1>THE FORM FOR PUTTING IN CARDS</h1>
+<form action="cardFormSubmitJava.php" method="post" id="form">
+	<ul>
+		<li>
+			<select name="type" onchange="changeForm(this.value)">
+				<option value="0" disabled selected>Select Color of Card</option>
+				<option value="g">Green</option>
+				<option value="r">Red</option>
+			</select>
+		</li>
+		<li>
+			<span id="dynamicForm"></span>
+		</li>
+		<li>
+			<button type="button" id="submitButton" onclick="checkSubmit()">Submit</button>
+		</li>
+	</ul>
+</form>
+<script>
+	function get(id) {
+		return document.getElementById(id);
+	}
+
+	var form = get("form");
+
+	function changeForm(val)
+	{
+		if(val == "g")
+		{
+			var str = "Input a random trivia question: <br><input type='text' name='question' />"+
+			"<ul>"+
+				"<li><input type='text' name='greenOp1' value='' onchange='checkOp(this, 1)' /><input type='radio' name='correct' id='correct1' value='1' disabled/></li>"+
+				"<li><input type='text' name='greenOp2' value='' onchange='checkOp(this, 2)' /><input type='radio' name='correct' id='correct2' value='2' disabled/></li>"+
+				"<li><input type='text' name='greenOp3' value='' onchange='checkOp(this, 3)' /><input type='radio' name='correct' id='correct3' value='3' disabled/></li>"+
+				"<li><input type='text' name='greenOp4' value='' onchange='checkOp(this, 4)' /><input type='radio' name='correct' id='correct4' value='4' disabled/></li>"+
+			"</ul>";
+			get("dynamicForm").innerHTML = str;
+		}
+		else if(val == "r")
+		{
+			get("dynamicForm").innerHTML = "Tell people to tell a story or ask them an ambiguous question: <br><input type='text' name='question'>";
+		}
+	}
+
+	function checkOp(thing, num)
+	{
+		if(thing.value != "")
+			get("correct" + num).disabled = false;
+		else
+			get("correct" + num).disabled = true;
+	}
+
+	function checkSubmit()
+	{
+		if(form.type.value == "g" && form.greenOp1.value != '' && form.greenOp2.value != '' && form.greenOp3.value != '' && form.question.value != '' && form.correct.value != '')
+		{
+			form.submit();
+		}
+		else if(form.type.value == "r" && form.question.value != '')
+		{
+			form.submit();
+		}
+		else
+		{
+			alert("Somewhere you fucked up. Fix it.");
+			return;
+		}
+	}
+</script>
+</body>
+</html>

@@ -1,0 +1,492 @@
+<html>
+<head>
+<style>
+	div
+	{
+		position: absolute;
+		z-index: 2;
+	}
+
+	canvas
+	{
+		position: absolute;
+		top: 130px;
+		left:10px;
+		border:5px solid black;
+	}
+
+	#functionText
+	{
+		position:relative;
+		overflow: scroll;
+		width: 200px;
+		height:100px;
+		background-color: white; 
+	}
+
+	*
+	{
+		font-family: Courier New;
+	}
+</style>
+</head>
+<body>
+<!-- color module -->
+<div style="position:absolute;top:0px;left:0px;"><input type="text" id="color" onblur="fillColor()" onchange="storeColor(this.value)"><span id="colors"></span><br><input type="text" id="red" size="5" onblur="fillNumbers()" onchange="fillNumbers(),storeColor(get('color').value)"><input type="text" id="green" size="5" onblur="fillNumbers()" onchange="fillNumbers(),storeColor(get('color').value)"><input type="text" id="blue" size="5" onblur="fillNumbers()" onchange="fillNumbers(),storeColor(get('color').value)"><br><button onclick="restart()">Reset</button>
+
+	<!-- <form id="form" method="post" action="saveShape.php">
+		<input type="text" name="functionName" value="unnamed" id="functionName"><br>
+		<textarea id="textarea" name="function" onclick="this.select()"></textarea><br>
+		<input type="button" onclick="submission()" value="Submit Drawing">
+	</form> -->
+	<div id="functionText">THIS IS WHERE THE FUNCTION TEXT GOES GAH GAH GAH GAH GAH GAH GAH GAH GAH GAH GAH GAH GAH GAH GAH GAH GAH GAH GAH GAH GAH GAH GAH GAH GAH GAH GAH GAH GAH GAH GAH GAH GAH GAH GAH GAH GAH GAH GAH GAH GAH GAH GAH GAH GAH GAH GAH GAH GAH GAH GAH GAH GAH GAH GAH GAH GAH</div>
+	<button type="button" onclick="endFunction()">End Drawing</button>
+</div>
+<canvas id="canvas" onmousedown="action()" onmousemove="action()" onmouseup="action()"></canvas>
+<script src="canvasLibrary.js"></script>
+<script src="colorFuns.js"></script>
+<script>
+var pic = new Picture();
+var canvas = get("canvas");
+var ctx = canvas.getContext("2d");
+ctx.canvas.height = document.body.clientHeight-150;
+ctx.canvas.width = document.body.clientWidth-25;
+get("color").value = randomColor();
+fillColor();
+var pointNum = 0;
+var prevMouseX;
+var prevMouseY;
+ctx.strokeStyle = "black";
+
+function get(id)
+{
+	return document.getElementById(id);
+}
+
+function restart()
+{
+	whiteCanvas();
+	pic = new Picture();
+	// get("colors").innerHTML = '';
+}
+
+function fillColor()
+{
+	if(get("color").value[0] != '#')
+		get("color").value = '#'+get("color").value;
+	get("red").value = hexToDecimal(get("color").value.substr(1,2));
+	get("green").value = hexToDecimal(get("color").value.substr(3,2));
+	get("blue").value = hexToDecimal(get("color").value.substr(5,2));
+}
+
+function fillNumbers()
+{
+	get("color").value = rgb(get("red").value,get("green").value,get("blue").value);
+}
+
+function storeColor(color)
+{
+	colorNum = 1*get("red").value+1*get("blue").value+1*get("green").value;
+	if(colorNum < 382)
+		get("colors").innerHTML += "<span style='background-color:"+color+";color:white;' onclick='get(\"color\").value=\""+color+"\", fillColor()'>"+color+"</span>";
+	else
+		get("colors").innerHTML += "<span style='background-color:"+color+";color:black;' onclick='get(\"color\").value=\""+color+"\", fillColor()'>"+color+"</span>";
+	fixColors(color);
+}
+
+function fixColors(color)
+{
+	get("color").value = color;
+	fillColor();
+}
+
+
+function action()
+{
+	switch(event.type)
+	{
+		case "mousedown":
+			if(pic.newShapePoints.length == 0)
+			{
+				if(pic.hovering != undefined)
+				{
+					if(event.shiftKey)
+					{
+						if(event.ctrlKey)
+						{
+							if(pic.hovering.marked)
+								pic.hovering.shape.unmarkAllinShape();
+							else
+								pic.hovering.shape.markAllinShape();
+						}
+						else
+						{
+							pic.unmarkAll();
+							pic.hovering.shape.markAllinShape();
+						}
+					}
+					else
+					{
+						if(event.ctrlKey)
+						{
+							if(pic.hovering.marked)
+								pic.hovering.unmark();
+							else
+								pic.hovering.mark();
+						}
+						else
+						{
+							pic.unmarkAll();
+							pic.hovering.mark();
+						}
+					}
+				}
+				else if(event.altKey && pic.hovering == undefined)
+				{
+					pic.addNewShapePoint(event);
+				}
+				else
+				{
+					pic.unmarkAll();
+				}
+			}
+			else if(event.altKey)
+			{
+				pic.addNewShapePoint(event);
+			}
+			else
+			{
+				pic.addShape();
+			}
+		break;
+
+		case "mousemove":
+			if(event.which == 0)
+			{
+				if(event.altKey && !event.shiftKey)
+				{
+					crosshairToggle(true);
+				}
+				else if(event.shiftKey && !event.altKey)
+				{
+					crosshairToggle(false);
+					pic.hoverPoint(event);
+					if(pic.hovering != undefined)
+						pic.hovering.shape.hoverAllinShape();
+				}
+				else
+				{
+					crosshairToggle(false);
+					pic.hoverPoint(event);
+				}
+			}
+			else if(event.which == 1 && pic.marked.length != 0)
+			{
+				if(pic.hovering != undefined && pic.hovering.marked)
+				{
+					if(!pic.moving)
+					{
+						prevMouseX = event.layerX;
+						prevMouseY = event.layerY;
+						pic.moving = true;
+					}
+					pic.move(event);
+					prevMouseX = event.layerX;
+					prevMouseY = event.layerY;
+				}
+			}
+		break;
+
+		case "mouseup":
+			if(pic.moving)
+			{
+				pic.moving = false;
+			}
+		break;
+	}
+	pic.draw();
+}
+
+function crosshairToggle(bool)
+{
+	if(bool)
+		get("canvas").style.cursor = "crosshair";
+	else
+		get("canvas").style.cursor = "";
+}
+
+function createFunc()
+{
+	if(get("functionName").value == 'unnamed')
+	{
+		alert("This function is unnamed. Name it!");
+		return false;
+	}
+	minofX = boxes[0].x;
+	minofY = boxes[0].y;
+	maxX = boxes[0].x;
+	for(var i=0;i<boxes.length;i++)
+	{
+		if(boxes[i].x < minofX)
+			minofX = boxes[i].x;
+		if(boxes[i].y < minofY)
+			minofY = boxes[i].y;
+		if(maxX < boxes[i].x)
+			maxX = boxes[i].x;
+	}
+	max = maxX - minofX;
+	func = "function "+get("functionName").value+"(x,y,length,ctx)\n{\n\tmax = "+max+";\n";
+	for(var i=0;i<boxes.length-1;i++)
+		func += "\tdrawRectangle(x+"+(boxes[i].x-minofX)+"*length/max,y+"+(boxes[i].y-minofY)+"*length/max,"+boxes[i].width+"*length/max,"+boxes[i].height+"*length/max,'"+boxes[i].color+"');\n";
+	func += "}";
+	document.getElementById("textarea").innerHTML = func;
+	return true;
+}
+
+function Picture()
+{
+	this.shapes = [];
+	this.hovering = undefined;
+	this.marked = [];
+	this.newShapePoints = [];
+	this.moving = false;
+	this.hoveringShape = undefined;
+
+	this.addNewShapePoint = function(event)
+	{
+		this.newShapePoints.push({x:event.layerX, y:event.layerY});
+	}
+
+	this.addShape = function()
+	{
+		if(this.newShapePoints.length < 3)
+		{
+			alert("A new shape needs at least 3 points.");
+			return;
+		}
+		this.shapes.push(new Shape(get("color").value, this.newShapePoints, this));
+		this.newShapePoints = [];
+	}
+
+	this.hoverPoint = function(event)
+	{
+		if(this.hovering != undefined)
+		{
+			if(Math.sqrt(Math.pow(event.layerX-this.hovering.x,2)+Math.pow(event.layerY-this.hovering.y,2)) >= 15)
+			{
+				// this.hovering.unhovering();
+				this.hovering = undefined;
+				this.hoveringShape = undefined;
+			}
+		}
+		else
+		{
+			for(var shape in this.shapes)
+			{
+				for(var point in this.shapes[shape].points)
+				{
+					if(Math.sqrt(Math.pow(event.layerX-this.shapes[shape].points[point].x,2)+Math.pow(event.layerY-this.shapes[shape].points[point].y,2)) < 15)
+					{
+						// this.shapes[shape].points[point].hovering();
+						this.hovering = this.shapes[shape].points[point];
+						return;
+					}
+				}
+			}
+		}
+	}
+
+	this.move = function(event)
+	{
+		for(var mark in this.marked)
+		{
+			this.marked[mark].move(event);
+		}
+	}
+
+	this.switchLayers = function(one, two)
+	{
+		temp = this.shapes[one];
+		this.shapes[one] = this.shapes[two];
+		this.shapes[two] = temp;
+	}
+
+	this.draw = function()
+	{
+		whiteCanvas();
+		for(var shape in this.shapes)
+			this.shapes[shape].draw();
+		for(var mark in this.marked)
+		{
+			ctx.lineWidth = 2;
+			ctx.strokeStyle = "black";
+			ctx.beginPath();
+			ctx.arc(this.marked[mark].x, this.marked[mark].y, 11, 0, Math.PI*2);
+			ctx.arc(this.marked[mark].x, this.marked[mark].y, 15, 0, Math.PI*2);
+			ctx.stroke();
+			ctx.strokeStyle = "white";
+			ctx.beginPath();
+			ctx.arc(this.marked[mark].x, this.marked[mark].y, 13, 0, Math.PI*2);
+			ctx.stroke();
+		}
+
+		if(this.hoveringShape != undefined)
+		{
+			for(var point in this.hoveringShape.points)
+			{
+				ctx.lineWidth = 2;
+				ctx.strokeStyle = "white";
+				ctx.beginPath();
+				ctx.arc(this.hoveringShape.points[point].x, this.hoveringShape.points[point].y, 11, 0, Math.PI*2);
+				ctx.arc(this.hoveringShape.points[point].x, this.hoveringShape.points[point].y, 15, 0, Math.PI*2);
+				ctx.stroke();
+				ctx.strokeStyle = "black";
+				ctx.beginPath();
+				ctx.arc(this.hoveringShape.points[point].x, this.hoveringShape.points[point].y, 13, 0, Math.PI*2);
+				ctx.stroke();
+			}
+		}
+		else if(this.hovering != undefined)
+		{
+			ctx.lineWidth = 2;
+			ctx.strokeStyle = "white";
+			ctx.beginPath();
+			ctx.arc(this.hovering.x, this.hovering.y, 11, 0, Math.PI*2);
+			ctx.arc(this.hovering.x, this.hovering.y, 15, 0, Math.PI*2);
+			ctx.stroke();
+			ctx.strokeStyle = "black";
+			ctx.beginPath();
+			ctx.arc(this.hovering.x, this.hovering.y, 13, 0, Math.PI*2);
+			ctx.stroke();
+		}
+
+		for(var each in this.newShapePoints)
+		{
+			ctx.lineWidth = 2;
+			ctx.strokeStyle = "white";
+			ctx.beginPath();
+			ctx.arc(this.newShapePoints.x, this.newShapePoints.y, 11, 0, Math.PI*2);
+			ctx.arc(this.newShapePoints.x, this.newShapePoints.y, 15, 0, Math.PI*2);
+			ctx.stroke();
+			ctx.strokeStyle = "black";
+			ctx.beginPath();
+			ctx.arc(this.newShapePoints.x, this.newShapePoints.y, 13, 0, Math.PI*2);
+			ctx.stroke();
+			ctx.beginPath();
+			ctx.arc(this.newShapePoints.x, this.newShapePoints.y, 5, 0, Math.PI*2);
+			ctx.fillStyle = "black";
+			ctx.fill();
+		}
+	}
+
+	this.unmarkAll = function()
+	{
+		for(var mark in this.marked)
+			this.marked[mark].marked = false;
+		this.marked = [];
+	}
+}
+
+function Shape(color, points, picture)
+{
+	this.points = [];
+	for(var point in points)
+		this.points.push(new Point(this, points[point].x, points[point].y));
+	this.color = color;
+	this.layer = 0;
+	this.picture = picture;
+
+	this.addPoint = function()
+	{
+		this.points.push(new Point(this, event.layerX, event.layerY));
+	}
+
+	this.draw = function()
+	{
+		ctx.beginPath();
+		ctx.moveTo(this.points[0].x, this.points[0].y);
+		for(var i = 1; i < this.points.length; i++)
+		{
+			ctx.lineTo(this.points[i].x, this.points[i].y);
+		}
+		ctx.closePath();
+		ctx.fillStyle = this.color;
+		ctx.fill();
+	}
+
+	this.hoverAllinShape = function()
+	{
+		this.picture.hoveringShape = this;
+	}
+
+	this.markAllinShape = function()
+	{
+		for(var point in this.points)
+			this.points[point].mark();
+	}
+
+	this.unmarkAllinShape = function()
+	{
+		for(var point in this.points)
+			this.points[point].unmark();
+	}
+
+	this.move = function()
+	{
+		// might be empty
+	}
+}
+
+function Point(shape, x, y)
+{
+	this.x = x;
+	this.y = y;
+	this.shape = shape;
+	this.marked = false;
+	this.id = pointNum++;
+
+	// this.hovering = function()
+	// {
+	// 	this.hovering = true;
+	// }
+
+	// this.unhovering = function()
+	// {
+	// 	this.hovering = false;
+	// }
+
+	this.mark = function()
+	{
+		if(this.marked)
+			return false;
+		this.marked = true;
+		this.shape.picture.marked.push(this);
+		return true;
+	}
+
+	this.unmark = function()
+	{
+		if(!this.marked)
+			return false;
+		this.marked = false;
+		for(var point = 0; point < this.shape.picture.marked.length; point++)
+		{
+			if(this.id == this.shape.picture.marked[point].id)
+			{
+				this.shape.picture.marked.splice(point,1);
+				break;
+			}
+		}
+		return true;
+	}
+
+	this.move = function(event)
+	{
+		this.x += event.layerX - prevMouseX;
+		this.y += event.layerY - prevMouseY;
+	}
+}
+
+</script>
+</body>
+</html>

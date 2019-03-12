@@ -1,0 +1,364 @@
+<html>
+<head>
+<style>
+	#stuff
+	{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+		z-index: 4;
+	}
+
+	#canvas
+	{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+	}
+
+	#linkThing:hover
+	{
+		text-decoration: underline;
+	}
+
+	*
+	{
+		font-family: Lucida Console;
+	}
+
+</style>
+</head>
+<body onkeydown="keyDown()" onkeyup="keyUp()" onmousedown="shooting()" onmouseup='finishedShooting()'>
+<div style="text-align:center;top:40%;position:absolute;width:99%;z-index:4;" id="startLink"><h1 style="color:white;"><span style='cursor:hand;' id="linkThing" onclick="get('startLink').style.visibility = 'hidden',run()">We have awoken<br>We are going to find you<br>And we will eat you</span></h1></div>
+<div id="stuff">
+	<h1 id='level' style='color:white;'>0</h1>
+	<!-- <button onclick="ctx.clearRect(0,0,pageWidth,pageHeight)">Clear Canvas</button><br> -->
+</div>
+<canvas id="canvas"></canvas>
+<script src="canvasLibrary.js"></script>
+<script src="colorFuns.js"></script>
+<script>
+var pageHeight = document.body.clientHeight;
+var pageWidth = document.body.clientWidth;
+var canvas = get("canvas");
+var ctx = canvas.getContext("2d");
+ctx.canvas.height = pageHeight;
+ctx.canvas.width = pageWidth;
+blackCanvas();
+var shitsFired = false;
+var runnning = false;
+var mouseX = pageWidth/2;
+var mouseY = pageHeight/2;
+var mouseYPrev = pageHeight/2;
+var mouseXPrev = pageWidth/2;
+var bulletsList = new Array();
+
+function get(id)
+{
+	return document.getElementById(id);	
+}
+
+function getClasses(clas)
+{
+	return document.getElementsByClassName(clas);
+}
+
+function shooting()
+{
+	// if(!shitsFired && running)
+	// {
+	// 	shitsFired = true;
+	// 	shotPathStart.x = mouseX;
+	// 	shotPathStart.y = mouseY;
+	// }
+}
+
+function finishedShooting()
+{
+	// if(shitsFired)
+	// {
+	// 	placeInLeftoverSpot(bulletsList, 5, new Bullet(shotPathStart.x,shotPathStart.y,-1*angleBetween(shotPathStart,shotPathEnd)+Math.PI));
+	// 	shitsFired = false;
+	// }
+}
+
+var zombies = new Array();
+var keysDown = new Array();
+
+function keyDown()
+{
+	// mouseX = event.x;
+	// mouseY = event.y;
+	// if(shitsFired && (mouseX == shotPathStart.x && mouseY == shotPathStart.y))
+	// {
+		
+	// }
+	// else if(shitsFired)
+	// {
+	// 	shotPathEnd.x = mouseX;
+	// 	shotPathEnd.y = mouseY;	
+	// }
+	keysDown[event.keyCode] = true;
+	if(event.keyCode == 32)
+	{
+		get('startLink').style.visibility = 'hidden'
+		run();
+	}
+}
+
+function keyUp()
+{
+	keysDown[event.keyCode] = false;
+	// console.log("Asshole");
+}
+
+var j=501;
+var level = 0;
+var bullets = 0;
+var step = 2;
+var bulletWait = 0;
+function run()
+{
+	running = true;
+	caught = -1;
+	blackCanvas();
+
+	mouseXPrev = mouseX;
+	mouseYPrev = mouseY;
+	if(keysDown[87] == true)
+	{
+		mouseY-=step;
+	}
+	if(keysDown[83] == true)
+	{
+		mouseY+=step;
+	}
+	if(keysDown[65] == true)
+	{
+		mouseX-=step;
+	}
+	if(keysDown[68] == true)
+	{
+		mouseX+=step;
+	}
+
+	if(bulletWait++ < 200)
+	{
+		placeInLeftoverSpot(bulletsList, 10, new Bullet(mouseX,mouseY,-angleBetween({x:mouseXPrev,y:mouseYPrev},{x:mouseX,y:mouseY})));
+		bulletWait = 0;
+	}
+
+	drawDiscatCenter(mouseX, mouseY, 10, "#0ff");
+
+	if(j++>500)
+	{
+		for(i in zombies)
+			zombies[i].stepLength += 1;
+		step += 1;
+		for(i=0;i<50;i++)
+			zombies.push(new Zombie());
+		j=0;
+		level++;
+		get('level').innerHTML = level;
+	}
+	for(i=0; i<bulletsList.length; i++)
+	{
+		if(bulletsList[i] != undefined)
+		{
+			bulletsList[i].draw();
+			if(!bulletsList[i].moveNext())
+				delete bulletsList[i];
+		}
+	}
+	// if(shitsFired)
+	// {
+	// 	ctx.lineWidth = "2px";
+	// 	ctx.strokeStyle = 'gray';
+	// 	ctx.beginPath();
+	// 	ctx.moveTo(shotPathStart.x,shotPathStart.y);
+	// 	ctx.lineTo(shotPathEnd.x,shotPathEnd.y);
+	// 	ctx.closePath();
+	// 	ctx.stroke();
+	// }
+	for(zomba in zombies)
+	{
+		if(!zombies[zomba].dead)
+		{
+			zombies[zomba].moveNext();
+			zombies[zomba].draw();
+			for(i=0; i<bulletsList.length; i++)
+			{
+				if(bulletsList[i] != undefined && zombies[zomba].shot(bulletsList[i]))
+					delete bulletsList[i];
+			}
+			if(zombies[zomba].detect(mouseX,mouseY))
+				caught = zomba;
+		}
+	}
+
+	if(caught == -1)
+		setTimeout(run, 1);
+	else
+	{
+		running = false;
+		zombies[caught].draw(undefined,"white");
+		step =2;
+		// alert("YOU SUCK EGGS");		
+		j=500;
+		zombies = new Array();
+		level = 0;
+		get('level').innerHTML = level;
+		get('startLink').style.visibility = 'visible';
+	}
+}
+
+function Zombie()
+{
+	angle = Math.random()*2*Math.PI;
+	radius = Math.sqrt(pageWidth*pageWidth/4+pageHeight*pageHeight/4);
+	this.x = pageWidth/2+Math.cos(angle)*radius;
+	this.y = pageHeight/2+Math.sin(angle)*radius;
+	// this.x = pageWidth/2;
+	// this.y = pageHeight/2;
+	this.health = 50;
+	this.angle = 0;
+	this.stepLength = 2;
+	this.dead = false;
+
+	this.moveNext = function(x,y)
+	{
+		if(this.x==mouseX)
+			this.angle = Math.PI/2+(this.y > mouseY ? 0 : Math.PI);
+		else
+			// this.angle = Math.atan((this.y - mouseY)/(this.x - mouseX))+(this.y < mouseY ? 0 : Math.PI);
+			this.angle = angleBetween({x:this.x,y:this.y},{x:mouseX,y:mouseY});
+		// get('stuff').innerHTML = this.angle/Math.PI;
+		this.x += Math.cos(this.angle)*this.stepLength;
+		this.y -= Math.sin(this.angle)*this.stepLength;
+		this.radius = 20;
+	}
+
+	this.draw = function(angle,color)
+	{
+		drawDiscatCenter(this.x,this.y,this.radius*2,percentRed(1-Math.sqrt(Math.pow(this.x-mouseX,2)+Math.pow(this.y-mouseY,2))/pageWidth*3));
+		if(color != undefined)
+			drawDiscatCenter(this.x,this.y,this.radius*2,color);
+
+	}
+
+	this.detect = function(x,y)
+	{
+		// if(distToSegment({x:x,y:y},{x:this.x,y:this.y},{x:this.x-Math.cos(this.angle)*582,y:this.y-Math.sin(this.angle)*252}) < 126)
+		if(Math.sqrt(Math.pow(this.x-mouseX,2)+Math.pow(this.y-mouseY,2)) < this.radius)
+			return true;
+		return false;
+	}
+
+	this.drawHealth = function()
+	{
+
+	}
+
+	this.shot = function(bullet)
+	{
+		if(bullet == undefined)
+			return false;
+		// y - mouseY = (mouseX-mousePrevX)/(mouseY-mousePrevY)*(x - mouseX);
+		shot = false
+		if(Math.sqrt(Math.pow((this.x-bullet.x),2)+Math.pow((this.y-bullet.y),2)) < (this.radius + bullet.radius))
+		{
+			this.health -= 51;
+			shot = true;
+			length = Math.sqrt(Math.pow(this.x-bullet.x,2)+Math.pow(this.y-bullet.y,2));
+			// this.x += (this.x-bullet.x)/length*20;
+			// this.y += (this.y-bullet.y)/length*20;
+		}
+		if(this.health <= 0)
+			this.dead = true;
+		return shot;
+	}
+}
+
+// point P, ends of the line segment V and W
+// each have the property X and Y
+function sqr(x) { return x * x }
+function dist2(v, w) { return sqr(v.x - w.x) + sqr(v.y - w.y) }
+function distToSegmentSquared(p, v, w) {
+  var l2 = dist2(v, w);
+  if (l2 == 0) return dist2(p, v);
+  var t = ((p.x - v.x) * (w.x - v.x) + (p.y - v.y) * (w.y - v.y)) / l2;
+  if (t < 0) return dist2(p, v);
+  if (t > 1) return dist2(p, w);
+  return dist2(p, { x: v.x + t * (w.x - v.x),
+                    y: v.y + t * (w.y - v.y) });
+}
+// USE THIS FUNCTION
+function distToSegment(p, v, w) { return Math.sqrt(distToSegmentSquared(p, v, w)); }
+
+function angleBetween(origin, point)
+{
+	if(typeof origin == "object")
+	{
+		if(point.x == origin.x)
+			if(point.y > origin.y)
+				return Math.PI/2;
+			else
+				return Math.PI/2*3;
+		return Math.atan((point.y - origin.y)/-(point.x - origin.x))+(point.x > origin.x ? 0 : Math.PI);
+	}
+	else
+	{
+		if(origin == 0)
+			if(point > 0)
+				return Math.PI/2;
+			else
+				return Math.PI/2*3;
+		return Math.atan(origin/-point)+(origin < 0 ? 0 : Math.PI);
+	}
+}
+
+function distToLine(a,b,c,x,y)
+{
+	return Math.abs(a*x+b*y+c)/Math.sqrt(a*a+b*b);
+}
+
+function Bullet(x,y,angle)
+{
+	this.x = x == undefined ? 0 : x;
+	this.y = y == undefined ? 0 : y;
+	this.radius = 5;
+	this.angle = angle == undefined ? 0 : angle;
+	this.speed = 5;
+
+	this.draw = function(white)
+	{
+		if(white == undefined)
+			white = "white";
+		drawDiscatCenter(this.x,this.y,this.radius*2,white);
+	}
+
+	this.moveNext = function()
+	{
+		this.x += Math.cos(this.angle)*this.speed;
+		this.y += Math.sin(this.angle)*this.speed;
+		if(this.x > pageWidth || this.x < 0 || this.y > pageWidth || this.y < 0)
+			return false;
+		return true;
+	}
+}
+
+function placeInLeftoverSpot(array, size, value)
+{
+	for(i=0; i < size; i++)
+	{
+		if(array[i] == undefined)
+		{
+			array[i] = value;
+			return i;
+		}
+	}
+	return -1;
+}
+</script>
+</body>
+</html>

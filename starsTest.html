@@ -1,0 +1,103 @@
+<html>
+<head>
+<style>
+	#stuff
+	{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+		z-index: 5;
+		color:blue;
+	}
+
+	#canvas
+	{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+	}
+</style>
+</head>
+<body>
+<div id="stuff">
+	<button onclick="ctx.clearRect(0,0,pageWidth,pageHeight)">Clear Canvas</button><br>
+	<span id="x"></span><br>
+	<span id="y"></span><br>
+	<span id="z"></span><br>
+</div>
+<canvas id="canvas"></canvas>
+<script src="canvasLibrary.js"></script>
+<script src="drawnFunctions.js"></script>
+<script>
+var pageHeight = document.body.clientHeight;
+var pageWidth = document.body.clientWidth;
+var canvas = get("canvas");
+var ctx = canvas.getContext("2d");
+ctx.canvas.height = pageHeight;
+ctx.canvas.width = pageWidth;
+
+function get(id)
+{
+	return document.getElementById(id);	
+}
+
+function getClasses(clas)
+{
+	return document.getElementsByClassName(clas);
+}
+
+// var star = new Star();
+var stars = new Array();
+for(i = 0; i < 200; i++)
+	stars[i] = new Star();
+function Star(x,y,z)
+{
+	this.radius = 100;
+	this.scale = 5000;
+	this.x = x == undefined ? Math.floor(Math.random()*pageWidth*2) : x;
+	this.y = y == undefined ? Math.floor(Math.random()*pageHeight*2) : y;
+	// this.z = z == undefined ? 0 : z;
+	this.z = z == undefined ? Math.floor(Math.random()*this.scale) : z;
+	this.val = Math.floor(Math.random()*150);
+	this.draw = function()
+	{
+
+		x = this.x/2 + Math.cos(Math.PI/2-Math.PI/2*(Math.abs(this.x-pageWidth)/pageWidth))*this.z*(this.x < pageWidth ? -1 : 1);
+		y = this.y/2 + Math.cos(Math.PI/2-Math.PI/2*(Math.abs(this.y-pageHeight)/pageHeight))*this.z*(this.y < pageHeight ? -1 : 1);
+
+		// get("x").innerHTML = this.x+' : '+x;
+		// get("y").innerHTML = this.y+' : '+y;
+		// get("z").innerHTML = this.z;
+		if(this.val != 1)
+			// tLetter(x,y,this.radius*this.z/this.scale,"white","stroke",ctx);
+			drawDiscatCenter(x, y, this.radius*this.z/this.scale, "white");
+		else
+			Bob(x,y,100*this.z/this.scale,"blue",ctx);
+		this.moveNext(x,y);
+	}
+
+	this.moveNext = function(x,y)
+	{
+		this.z+=this.z/20;
+		if(this.z >= this.scale || x > pageWidth || x < 0 || y < 0 || y > pageHeight)
+		{
+			// this.z = Math.floor(Math.random()*this.scale);
+			this.z=10;
+			this.x = Math.floor(Math.random()*pageWidth*2);
+			this.y = Math.floor(Math.random()*pageHeight*2);
+		}
+
+	}
+}
+// blackCanvas();
+function drawStars()
+{
+	blackCanvas();
+	for(balls in stars)
+		stars[balls].draw();
+	setTimeout(drawStars, 1);
+}
+drawStars();
+</script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<html>
+<body>
+	<div></div>
+<script>
+a = Math.pow(10,-6);
+b = 0.1;
+error = Math.pow(10,-5);
+function equ(x)
+{
+	return 0.15/x*(1-Math.pow((1+x),-240)) - 75;
+}
+
+div = document.getElementsByTagName("div")[0];
+
+
+i=0;
+j=0;
+while(i==0)
+{
+	div.innerHTML += "<br><br>" + j + "<br>";
+	c = equ(a);
+	div.innerHTML += "<br>lesser boundary<br>"+a;
+	div.innerHTML += "<br>F(lesser boundary)<br>"+c;
+	d = equ(b);
+	div.innerHTML += "<br>larger boundary<br>"+b;
+	div.innerHTML += "<br>F(larger boundary)<br>"+d;
+	div.innerHTML += "<br>Midpoint<br>"+ (a+b)/2;
+	z = equ((a+b)/2);
+	div.innerHTML += "<br>F(midpoint)<br>"+ z + "<br>";
+
+	if(Math.abs((a-b)/2)<=error)
+	{
+		div.innerHTML += "<br><br>" + z +"<br>"+ (a+b)/2;
+		i++;
+	}
+
+	if((c * z) < 0)
+	{
+		b = (a+b)/2;
+	}
+	else if((d * z) < 0)
+	{
+		a = (a+b)/2;
+	}
+	else
+	{
+		div.innerHTML += "<br><br><br>Ya dun fucked up";
+		i++;
+	}	
+	j++;
+}
+</script>
+</body>
+</html>

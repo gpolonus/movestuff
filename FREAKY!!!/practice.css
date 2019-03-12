@@ -1,0 +1,52 @@
+body {background-attachment:fixed;
+      scrollbar-face-color:99ff00;
+      scrollbar-base-color:00ffff;
+      scrollbar-highlight-color:6000ff;
+      scrollbar-trck-color:ff0000;
+}
+
+body.tounges2 {cursor:crosshair;}
+
+a:link {color:0060ff;
+background-color:000000;
+font-family:Arial;
+text-decoration:none;
+}
+
+a:link:hover {color:black;
+background-color:0060ff;
+Font-family:"Arial Black, Alba Super";
+text-decoration:none;
+}
+
+a:visited {color:ff0000;
+background-color:black;
+font-family:Arial;
+text-decoration:blink;
+}
+
+a:visited:hover {color:black;
+background-color:ff0000;
+font-family:"Arial Black, Alba Super";
+}
+
+
+
+.tounges {color:ffffff;
+              font-weight:bold;
+              font-size:81;
+	      background-color:000000;
+	      font-family:"bauhaus 93, Alba Matter, Goudy Stout";
+}
+
+h1.random {font-family:"Alba Matter, Arial Black, Goudy Stout";
+           color:99ff00;
+	   font-size:72;
+}
+
+img.random {background:000080;
+}
+
+.freaky {background:000000;
+            color:ffffff;
+}

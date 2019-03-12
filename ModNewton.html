@@ -1,0 +1,50 @@
+<html>
+<head>
+<title>
+Newton's Method
+</title>
+</head>
+<body>
+<div id="div"></div>
+<script>
+var div = document.getElementById("div");
+
+error = Math.pow(10,-5);
+start = 3.75;
+
+function f(x)
+{
+	return Math.exp(3*x) - 27*Math.pow(x,6) + 27*Math.pow(x,4)*Math.exp(x) - 9*x*x*Math.exp(2*x);
+}
+
+function dfdx(x)
+{
+	return 3*Math.exp(3*x) - 162*Math.pow(x,5) + 108*Math.pow(x,3)*Math.exp(x) + 27*Math.pow(x,4)*Math.exp(x) + 18*x*x*Math.exp(x) - 18*x*x*Math.exp(2*x) - 18*x*Math.exp(2*x);
+}
+
+function dffdxx(x)
+{
+	return 9*Math.exp(3*x) - 810*Math.pow(x,4) + 108*Math.pow(x,3)*Math.exp(x) + 324*Math.pow(x,2)*Math.exp(x) + 27*Math.pow(x,4)*Math.exp(x) + 108*Math.pow(x,3)*Math.exp(x) + 18*x*x*Math.exp(x) + 36*x*Math.exp(x) - 36*x*x*Math.exp(2*x) - 36*x*Math.exp(2*x) - 36*x*Math.exp(2*x) - 36*Math.exp(2*x);
+}
+
+i=0;
+p0 = start;
+div.innerHTML = p0 + "<br><br>";
+while(i<=1100 && i != -1)
+{
+	p = p0 - dfdx(p0)*f(p0) / ( Math.pow(dfdx(p0),2) - f(p0)*dffdxx(p0) );
+	div.innerHTML += i + "<br>" + p + "<br><br>";
+	if(Math.abs(p-p0)<error)
+	{
+		i= -2;
+		div.innerHTML += "f(p): " + f(p) + "<br>" + "f(p0): " + f(p0); 
+	}
+	i++;
+
+	p0 = p;
+
+}
+
+</script>
+</body>
+</html>

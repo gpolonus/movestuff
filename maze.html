@@ -1,0 +1,474 @@
+<html>
+<head>
+<style>
+	#stuff
+	{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+		z-index: 5;
+	}
+
+	#canvas
+	{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+	}
+</style>
+</head>
+<body>
+<div id="stuff">
+	<!-- <button onclick="ctx.clearRect(0,0,pageWidth,pageHeight)">Clear Canvas</button><br> -->
+</div>
+<canvas id="canvas"></canvas>
+<script src="canvasLibrary.js"></script>
+<script>
+var pageHeight = document.body.clientHeight;
+var pageWidth = document.body.clientWidth;
+var canvas = get("canvas");
+var ctx = canvas.getContext("2d");
+ctx.canvas.height = pageHeight;
+ctx.canvas.width = pageWidth;
+
+function get(id)
+{
+	return document.getElementById(id);	
+}
+
+function getClasses(clas)
+{
+	return document.getElementsByClassName(clas);
+}
+
+function Maze(l,h,size)
+{
+	this.squares = [];
+	this.l = l;
+	this.h = h;
+	this.size = size;
+	for(var i = 0; i < l; i++)
+	{
+		this.squares[i] = [];
+		for(var j = 0; j < h; j++)
+		{
+			this.squares[i][j] = new Box(i,j);
+		}
+	}
+
+	this.connectBoxes1 = function()
+	{
+		this.connectMoreBoxes1(0,0);
+	}
+
+	this.connectMoreBoxes1 = function(i, j)
+	{
+		if(Math.round(Math.random()+0.15) >= 1 && i != this.l-1)
+		{
+			this.squares[i][j].leftSide = 1;
+			this.connectMoreBoxes1(i+1,j);
+		}
+		if(Math.round(Math.random()+0.15) >= 1 && j != this.h-1)
+		{
+			this.squares[i][j].bottSide = 1;
+			this.connectMoreBoxes1(i,j+1);
+		}
+	}
+
+	this.connectBoxes2 = function()
+	{
+		for(var i = 0; i < this.l; i++)
+		{
+			for(var j = 0; j < this.h; j++)
+			{
+				if(Math.round(Math.random()+0.15) >= 1 && i != this.l-1)
+				{
+					this.squares[i][j].leftSide = 1;
+				}
+				if(Math.round(Math.random()+0.15) >= 1 && j != this.h-1)
+				{
+					this.squares[i][j].bottSide = 1;
+				}
+				if(Math.round(Math.random()+0.15) >= 1 && i != 0)
+				{
+					this.squares[i][j].toppSide = 1;
+				}
+				if(Math.round(Math.random()+0.15) >= 1 && j != 0)
+				{
+					this.squares[i][j].righSide = 1;
+				}
+			}
+		}
+	}
+
+	this.connectBoxes3 = function(adjust)
+	{
+		adjust = adjust == undefined ? 0 : adjust;
+		var entries = [];
+		var squares = this.squares;
+		var l = this.l;
+		var h = this.h;
+		var ma = this;
+		entries.push({x:Math.floor(this.l/2),y:0});
+		squares[entries[0].x][entries[0].y].marked = true;
+		function connectBoxesInner3()
+		{
+			p = entries.splice(0,1)[0];
+			i = p.x;
+			j = p.y;
+			if(Math.round(Math.random()+adjust) >= 1 && i != l-1 && !squares[i+1][j].marked)
+			{
+				squares[i][j].righSide = 1;
+				squares[i+1][j].leftSide = -1;
+				squares[i+1][j].marked = true;
+				entries.push({x:i+1,y:j});
+			}
+			if(Math.round(Math.random()+adjust) >= 1 && j != h-1 && !squares[i][j+1].marked)
+			{
+				squares[i][j].bottSide = 1;
+				squares[i][j+1].toppSide = -1;
+				squares[i][j+1].marked = true;
+				entries.push({x:i,y:j+1});
+			}
+			if(Math.round(Math.random()+adjust) >= 1 && i != 0 && !squares[i-1][j].marked)
+			{
+				squares[i][j].leftSide = 1;
+				squares[i-1][j].righSide = -1;
+				squares[i-1][j].marked = true;
+				entries.push({x:i-1,y:j});
+			}
+			if(Math.round(Math.random()+adjust) >= 1 && j != 0 && !squares[i][j-1].marked)
+			{
+				squares[i][j].toppSide = 1;
+				squares[i][j-1].bottSide = -1;
+				squares[i][j-1].marked = true;
+				entries.push({x:i,y:j-1});
+			}
+			if(entries.length != 0)
+			{
+				ma.drawFull();
+				setTimeout(connectBoxesInner3,1);
+			}
+		}
+		connectBoxesInner3();
+	}
+
+	this.connectBoxes4 = function(adjust)
+	{
+		adjust = adjust == undefined ? 0 : adjust;
+		entries = [];
+		entries.push({x:Math.floor(this.l/2),y:0});
+
+		while(entries.length != 0)
+		{
+			p = entries.splice(0,1)[0];
+			i = p.x;
+			j = p.y;
+			if(Math.round(Math.random()+adjust) >= 1 && j != this.h-1 && !this.squares[i][j+1].marked)
+			{
+				this.squares[i][j].bottSide = 1;
+				this.squares[i][j+1].toppSide = -1;
+				this.squares[i][j+1].marked = true;
+				entries.push({x:i,y:j+1});
+			}
+			if(Math.round(Math.random()+adjust) >= 1 && i != this.l-1 && !this.squares[i+1][j].marked)
+			{
+				this.squares[i][j].righSide = 1;
+				this.squares[i+1][j].leftSide = -1;
+				this.squares[i+1][j].marked = true;
+				entries.push({x:i+1,y:j});
+			}
+			if(Math.round(Math.random()+adjust) >= 1 && j != 0 && !this.squares[i][j-1].marked)
+			{
+				this.squares[i][j].toppSide = 1;
+				this.squares[i][j-1].bottSide = -1;
+				this.squares[i][j-1].marked = true;
+				entries.push({x:i,y:j-1});
+			}
+			if(Math.round(Math.random()+adjust) >= 1 && i != 0 && !this.squares[i-1][j].marked)
+			{
+				this.squares[i][j].leftSide = 1;
+				this.squares[i-1][j].righSide = -1;
+				this.squares[i-1][j].marked = true;
+				entries.push({x:i-1,y:j});
+			}
+		}
+	}
+
+	this.connectBoxes5 = function(adjust)
+	{
+		adjust = adjust == undefined ? 0 : adjust;
+		var ma = this;
+		connectBoxesInner5(Math.floor(this.l/2),0);
+		function connectBoxesInner5(i,j)
+		{
+			if(Math.round(Math.random()+adjust) >= 1 && j != ma.h-1 && !ma.squares[i][j+1].marked)
+			{
+				ma.squares[i][j].bottSide = 1;
+				ma.squares[i][j+1].toppSide = -1;
+				ma.squares[i][j+1].marked = true;
+				connectBoxesInner5(i,j+1);
+			}
+			if(Math.round(Math.random()+adjust) >= 1 && i != 0 && !ma.squares[i-1][j].marked)
+			{
+				ma.squares[i][j].leftSide = 1;
+				ma.squares[i-1][j].righSide = -1;
+				ma.squares[i-1][j].marked = true;
+				connectBoxesInner5(i-1,j);
+			if(Math.round(Math.random()+adjust) >= 1 && j != 0 && !ma.squares[i][j-1].marked)
+			{
+				ma.squares[i][j].toppSide = 1;
+				ma.squares[i][j-1].bottSide = -1;
+				ma.squares[i][j-1].marked = true;
+				connectBoxesInner5(i,j-1);
+			}
+			if(Math.round(Math.random()+adjust) >= 1 && i != ma.l-1 && !ma.squares[i+1][j].marked)
+			{
+				ma.squares[i][j].righSide = 1;
+				ma.squares[i+1][j].leftSide = -1;
+				ma.squares[i+1][j].marked = true;
+				connectBoxesInner5(i+1,j);
+			}
+			}
+		}
+	}
+
+	this.connectBoxes6 = function()
+	{
+
+	}
+
+
+	this.draw = function()
+	{
+		ctx.lineWidth = 2;
+		ctx.strokeStyle = "black";
+		ctx.beginPath();
+		ctx.rect(0,0,(this.length)*this.size, (this.height)*this.size);
+		ctx.closePath();
+		ctx.stroke();
+
+		
+		for(var i = 0; i < l; i++)
+		{
+			for(var j = 0; j < h; j++)
+			{
+				this.squares[i][j].drawPartial(this.size);
+			}
+		}
+	}
+
+	this.drawFull = function()
+	{
+		whiteCanvas();
+		for(var i = 0; i < l; i++)
+		{
+			for(var j = 0; j < h; j++)
+			{
+				if(this.squares[i][j].marked)
+				{
+					drawRectangle(i*this.size,j*this.size,this.size,this.size,"red");
+				}
+			}
+		}
+
+		for(var i = 0; i < l; i++)
+		{
+			for(var j = 0; j < h; j++)
+			{
+				this.squares[i][j].drawFull(this.size);
+			}
+		}		
+	}
+
+	this.unmarkAll = function()
+	{
+		for(var i = 0; i < l; i++)
+		{
+			for(var j = 0; j < h; j++)
+			{
+				this.squares[i][j].marked = false;
+			}
+		}	
+	}
+
+	this.disconnect = function()
+	{
+		for(var i = 0; i < l; i++)
+		{
+			for(var j = 0; j < h; j++)
+			{
+				this.squares[i][j].leftSide = 0;
+				this.squares[i][j].bottSide = 0;
+				this.squares[i][j].toppSide = 0;
+				this.squares[i][j].righSide = 0;
+			}
+		}
+	}
+
+// kills because of the Maximum CallStack Limit
+	// this.traipse = function()
+	// {
+	// 	var thi = this;
+	// 	function traipseInner(box)
+	// 	{
+	// 		// setTimeout(function(){
+	// 			if(box != undefined)
+	// 			{
+	// 				box.drawFull(thi.size, "blue");
+	// 				traipseInner(box.toppSide);
+	// 				traipseInner(box.leftSide);
+	// 				traipseInner(box.bottSide);
+	// 				traipseInner(box.righSide);
+	// 			}
+	// 		// },30,i,j);
+	// 	}
+	// 	traipseInner(this.squares[Math.round(Math.random()*(this.l-1))][Math.round(Math.random()*(this.h-1))]);
+	// }
+
+	this.findLongestPath = function(i,j)
+	{
+		if(i == undefined || j == undefined)
+		{
+			i = Math.round(Math.random()*(this.l-1));
+			j = Math.round(Math.random()*(this.h-1));
+		}
+
+		var entries = [];
+		var maxBox = {box:this.squares[i][j],length:0,dir:""};
+		entries.push(maxBox);
+		while(entries.length != 0)
+		{
+			p = entries.splice(0,1)[0];
+			length = p.length;
+			balls = 0;
+			if(p.box.leftSide != 0)
+			{
+				balls++;
+			}
+			if(p.box.toppSide != 0)
+			{
+				balls++;
+			}
+			if(p.box.righSide != 0)
+			{
+				balls++;
+			}
+			if(p.box.bottSide != 0)
+			{
+				balls++;
+			}
+
+			if(balls == 1 && !(p.box.x == i && p.box.y == j))
+			{
+				if(maxBox.length < length+1)
+					maxBox = {box:p.box, length:length+1};
+			}
+			else
+			{
+				if(p.box.leftSide != 0 && p.dir != "righ")
+				{
+					entries.push({box:this.squares[p.box.x-1][p.box.y],length:length+1,dir:"left"});
+				}
+				if(p.box.toppSide != 0 && p.dir != "bott")
+				{
+					entries.push({box:this.squares[p.box.x][p.box.y-1],length:length+1,dir:"topp"});
+				}
+				if(p.box.righSide != 0 && p.dir != "left")
+				{
+					entries.push({box:this.squares[p.box.x+1][p.box.y],length:length+1,dir:"righ"});
+				}
+				if(p.box.bottSide != 0 && p.dir != "topp")
+				{
+					entries.push({box:this.squares[p.box.x][p.box.y+1],length:length+1,dir:"bott"});
+				}
+			}
+		}
+
+		this.squares[i][j].drawFull(this.size,"blue");
+		maxBox.box.drawFull(this.size,"green");
+		return maxBox;
+	}
+}
+
+function Box(x,y)
+{
+	this.x = x;
+	this.y = y;
+	this.leftSide = 0;
+	this.bottSide = 0;
+	this.toppSide = 0;
+	this.righSide = 0;
+	this.marked = false;
+
+	this.drawPartial = function(size)
+	{
+		ctx.lineWidth = 2;
+		ctx.strokeStyle = "black";
+		if(this.leftSide == 0)
+		{
+			ctx.beginPath();
+			ctx.moveTo((this.x+1)*size,(this.y)*size);
+			ctx.lineTo((this.x+1)*size,(this.y+1)*size);
+			ctx.closePath();
+			ctx.stroke();
+		}
+		if(this.bottSide == 0)
+		{
+			ctx.beginPath();
+			ctx.moveTo((this.x)*size,(this.y+1)*size);
+			ctx.lineTo((this.x+1)*size,(this.y+1)*size);
+			ctx.closePath();
+			ctx.stroke()
+		}
+	}
+
+	this.drawFull = function(size,color)
+	{
+		ctx.lineWidth = 2;
+		ctx.strokeStyle = "black";
+		if(color != undefined)
+		{
+			drawRectangle(this.x*size,this.y*size,size,size,color);
+		}
+		if(this.righSide == 0)
+		{
+			ctx.beginPath();
+			ctx.moveTo((this.x+1)*size,(this.y)*size);
+			ctx.lineTo((this.x+1)*size,(this.y+1)*size);
+			ctx.closePath();
+			ctx.stroke();
+		}
+		if(this.bottSide == 0)
+		{
+			ctx.beginPath();
+			ctx.moveTo((this.x)*size,(this.y+1)*size);
+			ctx.lineTo((this.x+1)*size,(this.y+1)*size);
+			ctx.closePath();
+			ctx.stroke()
+		}
+		if(this.toppSide == 0)
+		{
+			ctx.beginPath();
+			ctx.moveTo((this.x)*size,(this.y)*size);
+			ctx.lineTo((this.x+1)*size,(this.y)*size);
+			ctx.closePath();
+			ctx.stroke()
+		}
+		if(this.leftSide == 0)
+		{
+			ctx.beginPath();
+			ctx.moveTo((this.x)*size,(this.y)*size);
+			ctx.lineTo((this.x)*size,(this.y+1)*size);
+			ctx.closePath();
+			ctx.stroke()
+		}
+	}
+}
+
+maze = new Maze(50,50,10);
+maze.connectBoxes4(0.15);
+maze.drawFull();
+</script>
+</body>
+</html>

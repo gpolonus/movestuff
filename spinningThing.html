@@ -1,0 +1,88 @@
+<html>
+<head>
+<style>
+	#stuff
+	{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+		z-index: 5;
+	}
+
+	#canvas
+	{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+	}
+</style>
+</head>
+<body>
+<div id="stuff">
+	<button onclick="ctx.clearRect(0,0,pageWidth,pageHeight)">Clear Canvas</button><br>
+	<span id="dicks"></span>
+</div>
+<canvas id="canvas" onclick="running = !running"></canvas>
+<script src="canvasLibrary.js"></script>
+<script src="colorFuns.js"></script>
+<script>
+var pageHeight = document.body.clientHeight;
+var pageWidth = document.body.clientWidth;
+var canvas = get("canvas");
+var ctx = canvas.getContext("2d");
+ctx.canvas.height = pageHeight;
+ctx.canvas.width = pageWidth;
+
+function get(id)
+{
+	return document.getElementById(id);	
+}
+
+function getClasses(clas)
+{
+	return document.getElementsByClassName(clas);
+}
+
+var points = new Array();
+// var num = prompt('How many planets?','3');
+var num = 2;
+for(i = 0 ; i < num ; i++)
+{
+	points.push({x:0,y:0,angle:0});
+	get("stuff").innerHTML += '&pi;/<input type="text" class="loopAngle" value="16" onchange="ctx.clearRect(0,0,pageWidth,pageHeight)"><br>';
+}
+getClasses("loopAngle")[1].value = 50;
+
+var running = true;
+var dicks = 0;
+function run()
+{
+	if(running)
+	{
+		for(i = 0 ; i < points.length ; i++)
+		{
+			points[i].angle += 1*Math.PI/getClasses("loopAngle")[i].value;
+			points[i].angle %= Math.PI*2;
+			points[i].x = Math.cos(points[i].angle)*(pageHeight < pageWidth ? pageHeight : pageWidth)*(i+1)/(points.length*2)+pageWidth/2;
+			points[i].y = Math.sin(points[i].angle)*(pageHeight < pageWidth ? pageHeight : pageWidth)*(i+1)/(points.length*2)+pageHeight/2;
+			drawDiscatCenter(points[i].x,points[i].y,5,"black");
+			if(i != 0)
+			{
+				ctx.lineWidth = '1';
+				ctx.strokeStyle = "black";
+				// ctx.strokeStyle = percentWhite(Math.sqrt(Math.pow(points[i].x-points[i-1].x,2)+Math.pow(points[i].y-points[i-1].y,2))/(pageHeight < pageWidth ? pageHeight : pageWidth));
+				ctx.beginPath();
+				ctx.moveTo(points[i].x,points[i].y);
+				ctx.lineTo(points[i-1].x,points[i-1].y);
+				ctx.closePath();
+				ctx.stroke();
+			}
+		}
+	}
+	if(dicks++ < 400*2+5)
+		setTimeout(run,1);
+}
+run();
+</script>
+</body>
+</html>

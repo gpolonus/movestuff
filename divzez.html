@@ -1,0 +1,155 @@
+<html>
+<head>
+<title>Messing With Stuff</title>
+<style>
+.one{
+	position:absolute;
+	z-index:1;
+	top:50px;
+	left:50px;
+	width:200px;
+	height:200px;
+	background-color: #000;
+}
+.two{
+	position:absolute;
+	z-index:2;
+	top:100px;
+	left:100px;
+	width:200px;
+	height:200px;
+	background-color: #f00;
+	}
+.three{
+	position:absolute;
+	z-index:3;
+	top:150px;
+	left:150px;
+	width:200px;
+	height:200px;
+	background-color: #0f0;
+	}
+.four{
+	position:absolute;
+	z-index:4;
+	top:200px;
+	left:200px;
+	width:200px;
+	height:200px;
+	background-color: #00f;
+	}
+.five{
+	position:absolute;
+	z-index:5;
+	top:250px;
+	left:250px;
+	width:200px;
+	height:200px;
+	background-color: #ff0;
+	}
+.six{
+	position:absolute;
+	z-index:6;
+	top:300px;
+	left:300px;
+	width:200px;
+	height:200px;
+	background-color: #f0f;
+	}
+.seven{
+	position:absolute;
+	z-index:7;
+	top:350px;
+	left:350px;
+	width:200px;
+	height:200px;
+	background-color: #0ff;
+	}
+.eight{
+	position:absolute;
+	z-index:8;
+	top:400px;
+	left:400px;
+	width:200px;
+	height:200px;
+	background-color: #fff;
+	}
+.nine{
+	position:absolute;
+	z-index:9;
+	top:450px;
+	left:450px;
+	width:200px;
+	height:200px;
+	background-color: gray;
+	}
+.ten{
+	position:absolute;
+	z-index:10;
+	top:500px;
+	left:500px;
+	width:200px;
+	height:200px;
+	background-color: orange;
+	}
+</style>
+</head>
+<body>
+<div class="one"></div>
+<div class="two"></div>
+<div class="three"></div>
+<div class="four"></div>
+<div class="five"></div>
+<div class="six"></div>
+<div class="seven"></div>
+<div class="eight"></div>
+<div class="nine"></div>
+<div class="ten"></div>
+<script src="jquery.js"></script>
+<script>
+$(document).ready( function(){
+	i = 10;
+	$('.one').mouseover(function(){
+		$('.one').css('z-index',i);
+		i++;
+	});
+		$('.two').mouseover(function(){
+		$('.two').css('z-index',i);
+		i++;
+	});
+		$('.three').mouseover(function(){
+		$('.three').css('z-index',i);
+		i++;
+	});
+		$('.four').mouseover(function(){
+		$('.four').css('z-index',i);
+		i++;
+	});
+		$('.five').mouseover(function(){
+		$('.five').css('z-index',i);
+		i++;
+	});
+		$('.six').mouseover(function(){
+		$('.six').css('z-index',i);
+		i++;
+	});
+		$('.seven').mouseover(function(){
+		$('.seven').css('z-index',i);
+		i++;
+	});
+		$('.eight').mouseover(function(){
+		$('.eight').css('z-index',i);
+		i++;
+	});
+		$('.nine').mouseover(function(){
+		$('.nine').css('z-index',i);
+		i++;
+	});
+		$('.ten').mouseover(function(){
+		$('.ten').css('z-index',i);
+		i++;
+	});
+});
+</script>
+</body>
+</html>

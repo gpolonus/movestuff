@@ -1,0 +1,27 @@
+<html>
+
+
+<body>
+<div id="stupid">
+<h2 style="color:red;">Are you stupid?</h2>
+<br>
+<h3 style="color:red;">To find out, put in your full name:</h3>
+<input  style="color:red;" type="text" length="100" placeholder="Answer the Question" id="ame">
+<button type="button" id="button" onclick="stupid()">Submit</button>
+</div>
+<script>
+function stupid()
+{
+	if(document.getElementById("ame").value == "Benjamin Ryan Roos" || document.getElementById("ame").value == "Benjamin Ryan Huevo Con Pollo Frito Roos")
+		document.getElementById("stupid").innerHTML = "<h1>HI BEN. YOU ARE STILL STUPID</h1>";
+	else
+		document.getElementById("stupid").innerHTML = "<h1>YOU ARE STUPID</h1>";
+}
+
+function get(ids)
+{
+	return document.getElementById('ids');
+}
+</script>
+</body>
+</html>

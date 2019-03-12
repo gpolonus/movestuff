@@ -1,0 +1,143 @@
+<html>
+<head>
+<title>This is supposed to move.</title>
+<style>
+#thing
+{
+	position: fixed;
+	background-color: blue;
+	height: 250px;
+	width: 250px;
+	top:100px;
+	left:100px;
+	font-size: 50px;
+	color: white;
+}
+
+#x, #y
+{
+	position: relative;
+	z-index: 2;
+	overflow: hidden;
+	background: white;
+}
+
+*
+{
+	font-family: Comic Sans MS;
+}
+</style>
+
+</head>
+<!-- <body onkeypress="works()"> -->
+<body onkeypress="moveloop(event, thingus, 1, 1)" onkeyup="keyup()">
+<h1>Status: Buggy</h1>
+<h2>Use WASD</h2>
+<div id="thing"></div>
+<span id="x"></span><br>
+<span id="y"></span><br>
+<span id="direction"></span>
+<script>
+var thingus = document.getElementById('thing');
+var x = 100;
+var y = 100;
+var xconstant = 1;
+var yconstant = 1;
+var xbox = document.getElementById('x');
+var ybox = document.getElementById('y');
+var direction = document.getElementById('direction');
+direction.position = 'relative';
+// var i = 0;
+// var move = setInterval(moveloop(event, thingus),10);
+
+function moveloop(e, thing, xsent, ysent)
+{
+	thing.style.backgroundColor = 'blue';
+	if(xsent == xconstant)
+	{
+
+		if(e.keyCode == 65) 
+		{
+			x--;
+			xsent++;
+			xconstant = xsent;
+			direction.innerHTML = 'Left';
+		}
+		else if(e.keyCode == 68)
+		{
+			x++;
+			xsent++;
+			xconstant = xsent;
+			direction.innerHTML = 'Right';
+		}
+
+		thing.style.left = x + "px";
+		
+		xbox.innerHTML = 'xsent:' + xsent + ' == xconstant:' + xconstant;
+		if(xsent == xconstant)
+		{
+			xbox.style.color = 'red';
+		}
+		else
+		{
+			xbox.style.color = 'black';
+		}
+	}
+
+	if(ysent == yconstant)
+	{
+		if(e.keyCode == 87)
+		{
+			y--;
+			ysent++;
+			yconstant = ysent;
+			direction.innerHTML = 'Up';
+		}
+		else if(e.keyCode == 83)
+		{
+			y++;
+			ysent++;
+			yconstant = ysent;
+			direction.innerHTML = 'Down';
+		}
+
+		thing.style.top = y + "px";
+		ybox.innerHTML = 'ysent:' + ysent + ' == yconstant:' + yconstant;
+		if(ysent == yconstant)
+		{
+			ybox.style.color = 'red';
+		}
+		else
+		{
+			ybox.style.color = 'black';
+		}
+
+	}
+
+	if((e.keyCode == 65 || e.keyCode == 68 || e.keyCode == 87 || e.keyCode == 83))
+	{
+		setTimeout(function(){moveloop(e, thing, xsent, ysent)},100);
+	}
+}
+
+function keyup()
+{
+	// if(event.keyCode)
+	// {
+	// 	if(event.keyCode == 65 || event.keyCode == 68)
+	// 	{
+			yconstant = 1;
+		// }
+		// if(event.keyCode == 83 || event.keyCode == 87)
+		// {
+			xconstant = 1;
+		// }
+	// }
+
+	thingus.style.backgroundColor = 'red';
+}
+
+
+</script>
+</body>
+</html>

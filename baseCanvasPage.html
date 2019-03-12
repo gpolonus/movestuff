@@ -1,0 +1,122 @@
+<html>
+<head>
+<style>
+	#stuff
+	{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+		z-index: 5;
+	}
+
+	#canvas
+	{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+	}
+
+	*
+	{
+		font-family: Courier New;
+	}
+</style>
+<title>GRJF`S TESTING PAGE</title>
+<link rel="icon" type="image/ico" href="freak.ico" />
+</head>
+<body onkeydown="keyBooleans()" onkeyup="keyBooleans()" onmousedown="keyBooleans()" onmousemove="keyBooleans()" onmouseup="keyBooleans()">
+<div id="stuff">
+	<!-- <button onclick="ctx.clearRect(0,0,pageWidth,pageHeight)">Clear Canvas</button><br> -->
+	<form id="form" action="saveCanvas.php" method="post"><input type="hidden" name="picture"><button type="button" onclick="save()">Save Canvas</button></form>
+</div>
+<canvas id="canvas"></canvas>
+<script src="canvasLibrary.js"></script>
+<script src="utilityLibrary.js"></script>
+<script src="colorFuns.js"></script>
+<script>
+var pageHeight = document.body.clientHeight;
+var pageWidth = document.body.clientWidth;
+var canvas = get("canvas");
+var ctx = canvas.getContext("2d");
+ctx.canvas.height = pageHeight;
+ctx.canvas.width = pageWidth;
+var keys = [];
+var mouseX = 0;
+var mouseY = 0;
+var stopped = false;
+ctx.strokeStyle = "white";
+drawAll();
+blackCanvas();
+
+function get(id)
+{
+	return document.getElementById(id);	
+}
+
+function getClasses(clas)
+{
+	return document.getElementsByClassName(clas);
+}
+
+function write(stuff)
+{
+	get("stuff").innerHTML = stuff;
+}
+
+function save()
+{
+	get("form").picture.value = canvas.toDataURL();
+	get("form").submit();
+}
+
+function drawAll()
+{
+
+}
+
+function keyBooleans()
+{
+	// speed++;
+	if(event.type=="keydown")
+	{
+		keys[event.which] = true;
+	}
+
+	else if(event.type == "keyup")
+	{
+		keys[event.which] = false;		
+	}
+
+	// else if(event.type == "mousedown")
+	// 	keys["mousedown"] = true;
+
+	// else if(event.type == "mouseup")
+	// 	keys["mousedown"] = false;
+	else if(event.type == "mousemove")
+	{
+		mouseX = event.x;
+		mouseY = event.y;
+	}
+	else if(event.type == "mousedown")
+		stopped = !stopped;
+}
+
+function render()
+{
+	if(!stopped)
+	{
+
+	}
+	else
+	{
+
+	}
+
+	drawAll();
+	setTimeout(render,10);
+}
+render();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+<html>
+<body>
+<div id="div"></div>
+<script>
+var div = document.getElementById("div");
+var times = 0;
+for(var i = 0; i < 1000; i++)
+{
+	var val = 0;
+	for(var j = 0; j < 5; j++)
+	{
+		if(Math.round(Math.random()*4) == 0)
+			val++;
+	}
+	if(val >= 2)
+		times++;
+	div.innerHTML += val+"<br>";
+}
+div.innerHTML = (times/1000) + "%<br>" + div.innerHTML;
+</script>
+</body>
+</html>

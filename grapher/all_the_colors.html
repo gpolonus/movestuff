@@ -1,0 +1,101 @@
+<html>
+<head>
+<title>
+Title Goes Here!
+</title>
+<style>
+
+</style>
+</head>
+<body>
+
+
+<script src="https://rawgithub.com/mrdoob/three.js/master/build/three.js"></script>
+<scrip src="mrdoob-three.js-r64-0-geb6c64d\mrdoob-three.js-eb6c64d\src\extras\geometries\TetrahedronGeometry.js"></script>
+<script>
+/*
+1.Import the script
+2.Make the scene
+3.Make the camera
+4.Make the renderer and set its size
+5.do the thing with the "document.body.appendChild( renderer.domElement );"
+6.Make geometries and things
+7.Make materials for the geometries
+8.Put the Geos and the Mats together
+9.Add the stuff to the scene
+10.Place the camera
+11.render and enjoy
+*/
+var scene = new THREE.Scene();
+var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+var renderer = new THREE.WebGLRenderer();
+renderer.setSize( window.innerWidth-100, window.innerHeight-100 );
+document.body.appendChild( renderer.domElement );
+
+//Make one cube for starters
+//CUBE
+//Do this once!
+var boxGeo = new THREE.CubeGeometry(5,5,5,1,1,1)
+
+//Things!
+var NUMCONST = 16581375;
+var i = 0;
+var colors = new Array();
+var colorMat = new Array();
+// var r;
+// var b;
+// var g;
+
+for(r=0; r<=255; r++)
+{
+	for(g=0; g<=255; g++)
+	{
+		for(b=0; b<=255; b++)
+		{
+			colorMat[i] = new THREE.MeshBasicMaterial(rgbToHex(r,g,b));
+			colors[i] = new THREE.Mesh(boxGeo,colorMat[i]);
+			colors[i].position.x = b*5;
+			colors[i].position.y = g*5;
+			colors[i].position.z = r*5;
+			scene.add(colors[i]);
+			i++;
+		}
+	}
+}
+
+function render() 
+{
+	requestAnimationFrame(render);
+	renderer.render(scene, camera);
+	camera.position.x = 637;
+	camera.position.y = -637;
+	camera.position.z = 637;
+}
+render();
+
+//functions for color conversion
+function componentToHex(c)
+{
+    var hex = c.toString(16);
+    return hex.length == 1 ? "0" + hex : hex;
+}
+
+function rgbToHex(r, g, b) 
+{
+    return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+}
+
+// function drawBox()
+// {
+// 	colorMat[i] = THREE.MeshBasicMaterial({color:"rgb("+r+","+g+","+b+")";});
+// 	colors[i] = THREE.Mesh(boxGeo,colorMat[i]);
+// 	colors[i].position.x = b*5;
+// 	colors[i].position.y = g*5;
+// 	colors[i].position.z = r*5;
+// 	scene.add(colors[i]);
+// 	i++;
+// }
+
+</script>
+</body>
+</html>

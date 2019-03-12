@@ -1,0 +1,163 @@
+<html>
+<head>
+<style>
+	#stuff
+	{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+		z-index: 5;
+	}
+
+	#canvas
+	{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+	}
+</style>
+</head>
+<body>
+<div id="stuff">
+	<button onclick="ctx.clearRect(0,0,pageWidth,pageHeight)">Clear Canvas</button><br>
+</div>
+<canvas id="canvas"></canvas>
+<script src="canvasLibrary.js"></script>
+<script>
+var pageHeight = document.body.clientHeight;
+var pageWidth = document.body.clientWidth;
+var canvas = get("canvas");
+var ctx = canvas.getContext("2d");
+ctx.canvas.height = pageHeight;
+ctx.canvas.width = pageWidth;
+
+function get(id)
+{
+	return document.getElementById(id);	
+}
+
+function getClasses(clas)
+{
+	return document.getElementsByClassName(clas);
+}
+
+ctx.lineWidth = 2;
+ctx.strokeStyle = "black";
+ctx.fillStyle = "black";
+
+function circle(x, y, radius)
+{
+	ctx.beginPath();
+	ctx.arc(x,y,radius,0,2*Math.PI);
+	ctx.closePath();
+	ctx.stroke();
+}
+
+function point(x, y)
+{
+	ctx.beginPath();
+	ctx.arc(x,y,5,0,2*Math.PI);
+	ctx.closePath();
+	ctx.fill();	
+}
+
+function implies(x,y)
+{
+	ctx.beginPath();
+	// top line
+	ctx.moveTo(x,y);
+	ctx.lineTo(x+20,y);
+	// bottom line
+	ctx.moveTo(x,y+10);
+	ctx.lineTo(x+20,y+10);
+	// top part of arrow
+	ctx.moveTo(x+25,y+5);
+	ctx.lineTo(x+15,y-5);
+	// bottom part of arrow
+	ctx.moveTo(x+25,y+5);
+	ctx.lineTo(x+15,y+15);
+	ctx.closePath();
+	ctx.stroke();
+}
+
+function rightArrow(x,y)
+{
+	ctx.beginPath();
+	// line
+	ctx.moveTo(x,y+5);
+	ctx.lineTo(x+25,y+5);
+	// top part of arrow
+	ctx.moveTo(x+25,y+5);
+	ctx.lineTo(x+15,y-5);
+	// bottom part of arrow
+	ctx.moveTo(x+25,y+5);
+	ctx.lineTo(x+15,y+15);
+	ctx.closePath();
+	ctx.stroke();
+}
+
+xoffset = 600;
+yoffset = 200;
+point(xoffset,yoffset);
+circle(xoffset,yoffset,30);
+for(var i = 0; i < 6; i++)
+{
+	angle = 2*Math.PI/6*i;
+	point(30*Math.sin(angle)+xoffset, 30*Math.cos(angle)+yoffset);
+	circle(30*Math.sin(angle)+xoffset, 30*Math.cos(angle)+yoffset,30);
+	ctx.beginPath();
+	ctx.moveTo(30*Math.sin(angle)+xoffset, 30*Math.cos(angle)+yoffset);
+	ctx.lineTo(30*Math.sin(angle+2*Math.PI/6)+xoffset, 30*Math.cos(angle+2*Math.PI/6)+yoffset);
+	ctx.closePath();
+	ctx.strokeStyle = "red";
+	ctx.stroke();
+	ctx.strokeStyle = "black";
+}
+
+ctx.fillText("&rarr;",50,50);
+
+point(50,230);
+circle(50,230,30);
+
+rightArrow(100-10,210);
+
+point(150,230);
+circle(150,230,30);
+point(150,200);
+
+rightArrow(200-10,210);
+
+point(250,230);
+circle(250,230,30);
+point(250,200);
+circle(250,200,30);
+
+rightArrow(300-10,210);
+
+point(350,230);
+circle(350,230,30);
+point(350,200);
+circle(350,200,30);
+point(30*Math.sin(2*Math.PI/6)+350, 30*Math.cos(2*Math.PI/6)+200);
+
+rightArrow(400-10,210);
+
+point(450,230);
+circle(450,230,30);
+point(450,200);
+circle(450,200,30);
+point(30*Math.sin(2*Math.PI/6)+450, 30*Math.cos(2*Math.PI/6)+200);
+circle(30*Math.sin(2*Math.PI/6)+450, 30*Math.cos(2*Math.PI/6)+200,30);
+ctx.beginPath();
+ctx.moveTo(30*Math.sin(2*Math.PI/6)+450, 30*Math.cos(2*Math.PI/6)+200);
+ctx.lineTo(30*Math.sin(2*Math.PI/6-2*Math.PI/6)+450, 30*Math.cos(2*Math.PI/6-2*Math.PI/6)+200);
+ctx.closePath();
+ctx.strokeStyle = "red";
+ctx.stroke();
+ctx.strokeStyle = "black";
+
+rightArrow(510,210);
+
+</script>
+</body>
+</html>

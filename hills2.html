@@ -1,0 +1,151 @@
+<html>
+<head>
+<style>
+	#stuff
+	{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+		z-index: 5;
+	}
+
+	#canvas
+	{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+	}
+</style>
+<title>GRJF`S TESTING PAGE</title>
+<link rel="icon" type="image/ico" href="freak.ico" />
+</head>
+<body onkeydown="keyBooleans()" onkeyup="keyBooleans()" onmousedown="keyBooleans()" onmousemove="keyBooleans()">
+<div id="stuff">
+	<!-- <button onclick="ctx.clearRect(0,0,pageWidth,pageHeight)">Clear Canvas</button><br> -->
+</div>
+<canvas id="canvas"></canvas>
+<script src="canvasLibrary.js"></script>
+<script src="colorFuns.js"></script>
+<script>
+var pageHeight = document.body.clientHeight;
+var pageWidth = document.body.clientWidth;
+var canvas = get("canvas");
+var ctx = canvas.getContext("2d");
+ctx.canvas.height = pageHeight;
+ctx.canvas.width = pageWidth;
+var keys = [];
+var mouseX = 0;
+var mouseY = 0;
+var stopped = false;
+ctx.lineWidth = 5;
+// var color = randomColor();
+// while(Math.abs(hexToDecimal(color.substr(1)) - 8947848) > 14540253)
+// {
+// 	color = randomColor();
+// }
+// ctx.strokeStyle = color;
+// ctx.fillStyle = invert(color);
+ctx.strokeStyle = "black";
+ctx.fillStyle = "white";
+// whiteCanvas();
+var disc = new Image();
+disc.src = "disc.png";
+
+function get(id)
+{
+	return document.getElementById(id);	
+}
+
+function getClasses(clas)
+{
+	return document.getElementsByClassName(clas);
+}
+
+function drawAll(drawMouseX, drawMouseY)
+{
+	var distance = 100;
+	for(var i = 0; i < pageWidth / distance * 2; i++)
+	{
+		for(var j = 0; j < pageHeight / distance * 2; j++)
+		{
+			drawDisc(i * distance - pageWidth/2 + (pageWidth/2 - drawMouseX) * (j%2), j * distance - pageHeight/2 + (pageHeight/2 - drawMouseY) * (i%2));
+		}
+	}
+}
+
+function drawDisc(x, y)
+{
+// 	var rad = 100;
+// 	ctx.beginPath();
+// 	ctx.arc(x,y,rad,0,2*Math.PI);
+// 	ctx.fill();
+// 	ctx.beginPath();
+// 	for(var i = 0; i < rad / (ctx.lineWidth + 5); i++)
+// 	{		
+// 		ctx.arc(x, y, (ctx.lineWidth + 5) * (i + 1), 0, Math.PI*2);
+// 	}
+// 	ctx.stroke();
+	ctx.drawImage(disc, x-100,y-100);
+}
+
+function keyBooleans()
+{
+	// speed++;
+	if(event.type=="keydown")
+	{
+		keys[event.which] = true;
+	}
+
+	else if(event.type == "keyup")
+	{
+		keys[event.which] = false;		
+	}
+
+	// else if(event.type == "mousedown")
+	// 	keys["mousedown"] = true;
+
+	// else if(event.type == "mouseup")
+	// 	keys["mousedown"] = false;
+	else if(event.type == "mousemove")
+	{
+		mouseX = event.x;
+		mouseY = event.y;
+	}
+	else if(event.type == "mousedown")
+		stopped = !stopped;
+}
+
+function render()
+{	
+	// whiteCanvas();
+	if(!stopped)
+	{
+
+	}
+	else
+	{
+
+	}
+
+	drawAll(mouseX, mouseY);
+	setTimeout(render,10);
+}
+render();
+
+function drawDisc2(x, y)
+{
+	var rad = 500;
+	ctx.beginPath();
+	ctx.arc(x,y,rad,0,2*Math.PI);
+	ctx.fill();
+	
+	for(var i = 0; i < rad / (ctx.lineWidth *2); i++)
+	{		ctx.beginPath();
+		ctx.arc(x, y, (ctx.lineWidth *2) * (i + 1), 0, Math.PI*2);
+	ctx.stroke();
+	}
+}
+
+</script>
+</body>
+</html>

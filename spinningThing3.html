@@ -1,0 +1,86 @@
+<html>
+<head>
+<style>
+	#stuff
+	{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+		z-index: 5;
+	}
+
+	#canvas
+	{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+	}
+</style>
+</head>
+<body onmousemove="mouseX = event.x; mouseY = event.y">
+<div id="stuff">
+	<button onclick="ctx.clearRect(0,0,pageWidth,pageHeight)">Clear Canvas</button><br>
+</div>
+<canvas id="canvas" onclick="running = !running"></canvas>
+<script src="canvasLibrary.js"></script>
+<script>
+var pageHeight = document.body.clientHeight;
+var pageWidth = document.body.clientWidth;
+var canvas = get("canvas");
+var ctx = canvas.getContext("2d");
+ctx.canvas.height = pageHeight;
+ctx.canvas.width = pageWidth;
+var mouseX = 0;
+var mouseY = 0;
+var prevPoints = new Array();
+
+function get(id)
+{
+	return document.getElementById(id);	
+}
+
+function getClasses(clas)
+{
+	return document.getElementsByClassName(clas);
+}
+
+var points = new Array();
+var num = prompt('How many planets?','3');
+for(balls = 0 ; balls < num ; balls++)
+{
+	points.push({x:0,y:0,angle:0});
+	prevPoints.push({x:0,y:0});
+	get("stuff").innerHTML += '&pi;/<input type="text" class="loopAngle" value="'+16*Math.pow(2,balls+1)+'" onchange="ctx.clearRect(0,0,pageWidth,pageHeight)"><br>';
+}
+
+var running = true;
+function run()
+{
+	if(running)
+	{
+		for(balls = 0 ; balls < points.length ; balls++)
+		{
+			prevPoints[balls].x = points[balls].x;
+			prevPoints[balls].y = points[balls].y;
+			points[balls].angle += 1*Math.PI/getClasses("loopAngle")[balls].value;
+			points[balls].x = Math.cos(points[balls].angle)*(pageHeight < pageWidth ? pageHeight : pageWidth)*(balls+1)/(points.length*2)+mouseX;
+			points[balls].y = Math.sin(points[balls].angle)*(pageHeight < pageWidth ? pageHeight : pageWidth)*(balls+1)/(points.length*2)+mouseY;
+			drawDiscatCenter(points[balls].x,points[balls].y,5,"black");
+			// if(balls != 0)
+			// {
+				ctx.lineWidth = '1';
+				ctx.strokeStyle = "black";
+				ctx.beginPath();
+				ctx.moveTo(points[balls].x,points[balls].y);
+				ctx.lineTo(prevPoints[balls].x,prevPoints[balls].y);
+				ctx.closePath();
+				ctx.stroke();
+			// }
+		}
+	}
+	setTimeout(run,1);
+}
+run();
+</script>
+</body>
+</html>

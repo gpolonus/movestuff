@@ -1,0 +1,227 @@
+<html>
+<head>
+<style>
+	#stuff
+	{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+		z-index: 5;
+	}
+
+	#canvas
+	{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+	}
+</style>
+<title>GRJF`S TESTING PAGE</title>
+<link rel="icon" type="image/ico" href="freak.ico" />
+</head>
+<body onkeydown="keyBooleans()" onkeyup="keyBooleans()" onmousedown="keyBooleans()" onmousemove="keyBooleans()">
+<div id="stuff">
+	<!-- <button onclick="ctx.clearRect(0,0,pageWidth,pageHeight)">Clear Canvas</button><br> -->
+</div>
+<canvas id="canvas"></canvas>
+<script src="canvasLibrary.js"></script>
+<script src="colorFuns.js"></script>
+<script>
+var pageHeight = document.body.clientHeight;
+var pageWidth = document.body.clientWidth;
+var canvas = get("canvas");
+var ctx = canvas.getContext("2d");
+ctx.canvas.height = pageHeight;
+ctx.canvas.width = pageWidth;
+var keys = [];
+var mouseX = 0;
+var mouseY = 0;
+var stopped = false;
+// drawAll();
+blackCanvas()
+ctx.lineWidth = 2;
+ctx.strokeStyle = "white";
+
+function get(id)
+{
+	return document.getElementById(id);	
+}
+
+function getClasses(clas)
+{
+	return document.getElementsByClassName(clas);
+}
+
+var amount = 0;
+var sections = 7;
+var bigDisc = new Image();
+bigDisc.src = "bigDisc.png";
+var chasers = [new Ball(), new Ball(0, pageHeight), new Ball(pageWidth, 0), new Ball(pageWidth, pageHeight)];
+function drawAll()
+{
+	blackCanvas();
+	// for(var i = 0; i < Math.floor(700/4); i++)
+	// {
+	// 	ctx.beginPath();
+	// 	ctx.arc(pageWidth/2, pageHeight/2, i*4, 0, Math.PI*2);
+	// 	ctx.stroke();
+	// }
+	var xamount = Math.pow(mouseX - pageWidth/2, 2)*2000/Math.pow(pageWidth,2);
+	var yamount = Math.pow(mouseY - pageHeight/2, 2)*2000/Math.pow(pageHeight,2);
+	ctx.drawImage(bigDisc, -1*xamount/2, -1*yamount/2, pageWidth + xamount, pageHeight + yamount);
+
+	for(var i = 0; i < sections; i++)
+	{
+		// i = 0;
+		var angle = i*Math.PI*2/sections;
+		linedLeaf((pageWidth/2+200), pageHeight/2, 700 * Math.cos(angle) + (pageWidth/2+200) + (mouseX-(pageWidth/2+200))/Math.sqrt(Math.pow(mouseX-(pageWidth/2+200),2)+Math.pow(mouseY - pageHeight/2,2))*150, 700 * Math.sin(angle) + pageHeight/2 + (mouseY-pageHeight/2)/Math.sqrt(Math.pow(mouseX-(pageWidth/2+200),2)+Math.pow(mouseY - pageHeight/2,2))*150);
+		linedLeaf((pageWidth/2-200), pageHeight/2, 700 * Math.cos(angle) + (pageWidth/2-200) + (mouseX-(pageWidth/2-200))/Math.sqrt(Math.pow(mouseX-(pageWidth/2-200),2)+Math.pow(mouseY - pageHeight/2,2))*150, 700 * Math.sin(angle) + pageHeight/2 + (mouseY-pageHeight/2)/Math.sqrt(Math.pow(mouseX-(pageWidth/2-200),2)+Math.pow(mouseY - pageHeight/2,2))*150);
+		linedLeaf(pageWidth/2, pageHeight/2, 700 * Math.cos(angle) + pageWidth/2 + (mouseX-pageWidth/2)/Math.sqrt(Math.pow(mouseX-pageWidth/2,2)+Math.pow(mouseY - pageHeight/2,2))*150, 700 * Math.sin(angle) + pageHeight/2 + (mouseY-pageHeight/2)/Math.sqrt(Math.pow(mouseX-pageWidth/2,2)+Math.pow(mouseY - pageHeight/2,2))*150);			
+	}
+
+	for(var i in chasers)
+	{
+		chasers[i].move(mouseX, mouseY);
+		chasers[i].draw();	 
+	}
+}
+
+function linedLeaf(x, y, x0, y0)
+{
+	ctx.lineWidth = 2;
+	var centerAngle = Math.PI*2/sections;
+	var vecDist = Math.sqrt(Math.pow(x - x0, 2) + Math.pow(y - y0, 2));
+	var perpVecDist = Math.tan(centerAngle/2)*vecDist/2;
+	var perpVec = {
+		x:  (x+x0)/2, 
+		y:  (y+y0)/2,
+		x0: -1*(y0 - y)*perpVecDist/vecDist + (x+x0)/2,
+		y0: (x0 - x)*perpVecDist/vecDist + (y+y0)/2
+	};
+	var old = ctx.fillStyle;
+	ctx.fillStyle = "black";
+	ctx.beginPath();
+	ctx.moveTo(x,y);
+	ctx.lineTo(perpVec.x0, perpVec.y0);
+	ctx.lineTo(x0, y0);
+	ctx.lineTo(2*perpVec.x - perpVec.x0, perpVec.y*2 - perpVec.y0);
+	ctx.fill();
+	ctx.fillStyle = old;
+	var sideDist = Math.sqrt(Math.pow(x - perpVec.x0,2) + Math.pow(y - perpVec.y0,2));
+	var times = Math.floor(Math.tan(centerAngle/2)*vecDist/4/ctx.lineWidth);
+	for(var i = 0; i < times; i++)
+	{
+		ctx.beginPath();
+		ctx.moveTo((perpVec.x0 - x)/sideDist*(sideDist * (1-i/times)) + x, (perpVec.y0 - y)/sideDist*(sideDist * (1-i/times)) + y);
+		ctx.lineTo((perpVec.x0 - x0)/sideDist*(sideDist * (1-i/times)) + x0, (perpVec.y0 - y0)/sideDist*(sideDist * (1-i/times)) + y0);
+		ctx.stroke();
+	}
+	
+	for(var i = 0; i < times; i++)
+	{
+		ctx.beginPath();
+		ctx.moveTo(((2*perpVec.x - perpVec.x0) - x)/sideDist*(sideDist * (1-i/times)) + x, ((2*perpVec.y - perpVec.y0) - y)/sideDist*(sideDist * (1-i/times)) + y);
+		ctx.lineTo(((2*perpVec.x - perpVec.x0) - x0)/sideDist*(sideDist * (1-i/times)) + x0, ((2*perpVec.y - perpVec.y0) - y0)/sideDist*(sideDist * (1-i/times)) + y0);
+		ctx.stroke();
+	}
+
+	ctx.beginPath();
+	ctx.moveTo(x, y);
+	ctx.lineTo(x0, y0);
+	ctx.stroke();
+}
+
+function Ball(x,y)
+{
+	this.x = x == undefined ? 0 : x;
+	this.y = y == undefined ? 0 : y;
+
+	this.draw = function()
+	{
+		ctx.beginPath();
+		ctx.arc(this.x, this.y, 20, 0, Math.PI*2);
+		ctx.fill();
+	}
+
+	this.move = function(x, y)
+	{
+		var dist = distance(x,y,this.x,this.y)
+		if(dist == 0)
+			return;
+		if(dist < 20)
+		{
+			ctx.strokeStyle = "black";
+			ctx.font = "100px Courier New";
+			ctx.strokeText("KEEP MOVING",200,200);
+			ctx.strokeStyle = "white";
+			chasers.push(new Ball(Math.round(Math.random()*pageWidth), Math.round(Math.random()*pageHeight)));
+		}
+		this.x += (x - this.x)/dist * 2;
+		this.y += (y - this.y)/dist * 2;
+	}
+}
+
+function distance(x, y, x0, y0)
+{
+	return Math.sqrt(Math.pow(x-x0,2) + Math.pow(y-y0,2));
+}
+
+function keyBooleans()
+{
+	// speed++;
+	if(event.type=="keydown")
+	{
+		keys[event.which] = true;
+	}
+
+	else if(event.type == "keyup")
+	{
+		keys[event.which] = false;		
+	}
+
+	// else if(event.type == "mousedown")
+	// 	keys["mousedown"] = true;
+
+	// else if(event.type == "mouseup")
+	// 	keys["mousedown"] = false;
+	else if(event.type == "mousemove")
+	{
+		mouseX = event.x;
+		mouseY = event.y;
+		amount = (amount + 0.01)%(Math.PI*2);
+	}
+	// else if(event.type == "mousedown")
+	// 	stopped = !stopped;
+}
+
+function render()
+{
+	if(!stopped)
+	{
+		drawAll();
+		if(chasers.length > 100)
+		{
+			blackCanvas();
+			ctx.strokeStyle = "white";
+			ctx.font = "100px Courier New";
+			ctx.strokeText("YOU DUN FUCKED UP",200,200);
+			stopped = true;
+		}
+	}
+	else
+	{
+
+	}
+
+	setTimeout(render,10);
+}
+render();
+
+function greaterValue(one, two)
+{
+	return one > two ? one : two;
+}
+
+</script>
+</body>
+</html>

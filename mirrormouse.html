@@ -1,0 +1,21 @@
+<HTML>
+<HEAD>
+<TITLE>Enhanced Cursor</TITLE>
+</HEAD>
+<BODY onmousemove="enhancecursor();" >
+<!-- <BODY onmousedown="enhancecursor();" > -->
+<DIV ID="cursorplus" style="position:absolute;top:10;left:10;height:20;width:20;background-color:red"></DIV>
+</BODY>
+<SCRIPT>
+var cursorplus = document.getElementById("cursorplus");
+var i = 0;
+function enhancecursor() {
+	i++;
+	var x = event.clientX-10;
+	var y = event.clientY-10;
+	cursorplus.style.left=(screen.availWidth - x)+"px";
+	cursorplus.style.top=(screen.availHeight - y)+"px";
+	cursorplus.innerHTML = i;
+}
+</SCRIPT>
+</HTML>

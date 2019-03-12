@@ -1,0 +1,338 @@
+<html>
+<head>
+<title>
+TESTING AREA WATCH OUT
+</title>
+<style>
+body
+{
+	background-color: black;
+	color:white;
+}
+
+canvas
+{
+	width:100%;
+	height:100%;
+	z-index:1;
+	position:absolute;
+}
+
+span
+{
+	z-index: 2;
+	position: absolute;
+}
+
+span#id
+{
+	position: absolute;
+	z-index: 2;
+}
+
+*
+{
+	font-family: Courier New;
+}
+</style>
+</head>
+<body>
+<span>
+<div id="buttons">
+	<button onmousedown="moveCamXM()" onmouseup="stop()">XM</button><br><button onmousedown="moveCamXP()" onmouseup="stop()">XP</button><br><button onmousedown="moveCamYM()" onmouseup="stop()">YM</button><br><button onmousedown="moveCamYP()" onmouseup="stop()">YP</button><br><button onmousedown="moveCamZM()" onmouseup="stop()">ZM</button><br><button onmousedown="moveCamZP()" onmouseup="stop()">ZP</button><br>
+<button onmousedown="phiP()" onmouseup="stop()">^</button>__<button onmousedown="thetaP()" onmouseup="stop()">^</button>___<button onmousedown="rhoP()" onmouseup="stop()">^</button><br>PHI THETA RHO<br><button onmousedown="phiM()" onmouseup="stop()">v</button>__<button onmousedown="thetaM()" onmouseup="stop()">v</button>___<button onmousedown="rhoM()" onmouseup="stop()">v</button>
+</div>
+
+<br>
+<button onclick="resetCam()">Reset Camera</button><br>
+x:<div id="xRot"></div>
+y:<div id="yRot"></div>
+z:<div id="zRot"></div>
+
+</span>
+<!-- <script src="https://rawgithub.com/mrdoob/three.js/master/build/three.js"></script> -->
+<script src="C:\Program Files (x86)\Zend\Apache2\htdocs\IM215\movestuff\grapher\mrdoob-three.js-r64-0-geb6c64d\mrdoob-three.js-eb6c64d\src\three.js"></script>
+<script>
+/*
+1.Import the script
+2.Make the scene
+3.Make the camera
+4.Make the renderer and set its size
+5.do the thing with the "document.body.appendChild( renderer.domElement );"
+6.Make geometries and things
+7.Make materials for the geometries
+8.Put the Geos and the Mats together
+9.Add the stuff to the scene
+10.Place the camera
+11.render and enjoy
+*/
+var scene = new THREE.Scene();
+var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+var renderer = new THREE.WebGLRenderer();
+renderer.setSize( window.innerWidth-100, window.innerHeight-100 );
+document.body.appendChild( renderer.domElement );
+
+//plane stuff
+var PLANESIZE = 300;
+var planeGeo = new THREE.PlaneGeometry(PLANESIZE,PLANESIZE,15,15);
+
+//ZFront plane (regular plane) purple
+var planeMat = new THREE.MeshBasicMaterial({color:0x8243d6, transparent:true});
+var planeZFront = new THREE.Mesh(planeGeo, planeMat);
+planeZFront.position.z = -PLANESIZE/2;
+
+//ZBack PLane (behind you) PURPLE
+var planeMat = new THREE.MeshDepthMaterial({color:0x330570, transparent:true});
+var planeZBack = new THREE.Mesh(planeGeo, planeMat);
+planeZBack.position.z = PLANESIZE/2;
+planeZBack.rotation.y = Math.PI;
+
+//XLeft plane ORANGE
+var planeMat = new THREE.MeshDepthMaterial({color:0xff4900});
+var planeXLeft = new THREE.Mesh(planeGeo,planeMat);
+planeXLeft.position.x = -PLANESIZE/2;
+planeXLeft.rotation.y = Math.PI/2;
+
+//XRight plane ORANGE
+var planeMat = new THREE.MeshDepthMaterial({color:0xff7640, transparent:true});
+var planeXRight = new THREE.Mesh(planeGeo, planeMat);
+planeXRight.position.x = PLANESIZE/2;
+planeXRight.rotation.y = -Math.PI/2;
+
+//YTop plane GREEN
+var planeMat = new THREE.MeshDepthMaterial({color:0x007241, transparent:true});
+var planeYTop = new THREE.Mesh(planeGeo, planeMat);
+planeYTop.position.y = PLANESIZE/2;
+planeYTop.rotation.x = Math.PI/2;
+
+//YBOTTOM plane GREEN
+var planeMat = new THREE.MeshDepthMaterial({color:0x00af64, transparent:true});
+var planeYBottom = new THREE.Mesh(planeGeo, planeMat);
+planeYBottom.position.y = -PLANESIZE/2;
+planeYBottom.rotation.x = -Math.PI/2;
+
+//Spinning Torus just for fun
+//TorusGeometry(radius, tube, radialSegments, tubularSegments, arc)
+var torusGeo = new THREE.TorusGeometry(20, 10, 16, 8, Math.PI*2);
+var wiretorusMat = new THREE.MeshBasicMaterial({color:0xffffff,wireframe:true});
+var darktorusMat = new THREE.MeshBasicMaterial({color:0xcc0000});
+var darktorus = new THREE.Mesh(torusGeo, darktorusMat);
+var wiretorus = new THREE.Mesh(torusGeo, wiretorusMat);
+wiretorus.position.y = -50;
+darktorus.position.y = -50;
+
+//sphere at the center
+//SphereGeometry(radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength)
+var ballGeo = new THREE.SphereGeometry(5, 10, 15, 0, Math.PI*2, 0, Math.PI*2);
+var ballMat = new THREE.MeshBasicMaterial({color:0x00ffff, wireframe:true});
+var ball = new THREE.Mesh(ballGeo, ballMat);
+var ballMat = new THREE.MeshBasicMaterial({color:0x00ff00});
+var ball2 = new THREE.Mesh(ballGeo, ballMat);
+
+//TetraHedronGeometry(radius, detail)
+//detail is the addition number of vertices
+var tetraGeo = new THREE.TetrahedronGeometry(20, 0);
+var tetraMat = new THREE.MeshBasicMaterial({color:0xffffff, wireframe:true});
+var tetra = new THREE.Mesh(tetraGeo, tetraMat);
+
+
+//adding things
+scene.add(planeZFront);
+scene.add(planeZBack);
+scene.add(planeXLeft);
+scene.add(planeXRight);
+scene.add(planeYTop);
+scene.add(planeYBottom);
+scene.add(tetra);
+
+//resetting variables
+	var x=0;
+	var y=0;
+	var z=0;
+	var xRot = document.getElementById('xRot');
+	var yRot = document.getElementById("yRot");
+	var zRot = document.getElementById("zRot");
+	camera.position.x = 0;
+	camera.position.y = 0;
+	camera.position.z = 0;
+	camera.rotation.x = 0;
+	camera.rotation.y = 0;
+	camera.rotation.z = 0;
+	xRot.innerHTML = 0;
+	yRot.innerHTML = 0;
+	var rho = 0;
+	var theta = 0;
+	var phi = 0;
+	var are = 0;
+	zRot.innerHTML = "";
+	yRot.innerHTML = "";
+	xRot.innerHTML = "";
+	resetCam();
+
+//render dat bitch
+function render() 
+{
+	requestAnimationFrame(render);
+	renderer.render(scene, camera);
+}
+render();
+
+
+//Moving the camera with the mouse
+//Cartesian movement
+function moveCamXP()
+{
+	camera.rotation.x += 0.005;
+	if(sentinal==1)
+		setTimeout(moveCamXP, 1);
+	sentianl=1;
+}
+function moveCamXM()
+{
+	camera.rotation.x -= 0.005;
+	if(sentinal==1)
+		setTimeout(moveCamXM, 1);
+	sentianl=1;
+}
+function moveCamYP()
+{
+	camera.rotation.y += 0.005;
+	if(sentinal==1)
+		setTimeout(moveCamYP, 1);
+	sentianl=1;
+}
+function moveCamYM()
+{
+	camera.rotation.y -= 0.005;
+	if(sentinal==1)
+		setTimeout(moveCamYM, 1);
+	sentianl=1;
+}
+
+function moveCamZP()
+{
+	camera.rotation.z += 0.005;
+	if(sentinal==1)
+		setTimeout(moveCamZP, 1);
+	sentianl=1;
+}
+function moveCamZM()
+{
+	camera.rotation.z -= 0.005;
+	if(sentinal==1)
+		setTimeout(moveCamZM, 1);
+	sentianl=1;
+}
+
+//Moving the camera on a cone
+function rhoP()
+{
+	rho -= 1;
+	radialConvert();
+	if(sentinal==1)
+		setTimeout(rhoP, 1);
+	sentianl=1;
+}
+
+function rhoM()
+{
+	rho += 1;
+	radialConvert();
+	if(sentinal==1)
+		setTimeout(rhoM, 1);
+	sentianl=1;
+}
+function thetaP()
+{
+	theta += 0.01;
+	radialConvert();
+	if(sentinal==1)
+		setTimeout(thetaP, 1);
+	sentianl=1;
+}
+function thetaM()
+{
+	theta -= 0.01;
+	radialConvert();
+	if(sentinal==1)
+		setTimeout(thetaM, 1);
+	sentianl=1;
+}
+function phiP()
+{
+	phi += 0.01;
+	radialConvert();
+	if(sentinal==1)
+		setTimeout(phiP, 1);
+	sentianl=1;
+}
+function phiM()
+{
+	phi -= 0.01;
+	radialConvert();
+	if(sentinal==1)
+		setTimeout(phiM, 1);
+	sentianl=1;
+}
+
+function radialConvert()
+{
+	// theta %= 2*Math.PI;
+	// phi %= 2*Math.PI;	
+	are = rho * Math.sin(phi);
+	camera.position.x = are * Math.cos(theta);
+	camera.position.y = are * Math.sin(theta);
+	camera.position.z = rho * Math.cos(phi);
+	rotCamXP();
+}
+
+//for pointing the camera at the center
+function rotCamXP()
+{
+	x = camera.position.x;
+	// xRot.innerHTML = camera.rotation.x;
+	xRot.innerHTML = "PHI: " + phi/Math.PI*180;
+	y = camera.position.y;
+	// yRot.innerHTML = camera.rotation.y;
+	yRot.innerHTML = "THETA: " + theta/Math.PI*180;
+	z = camera.position.z;
+	// zRot.innerHTML = camera.rotation.z;
+	zRot.innerHTML = "RHO:" + rho;
+		camera.rotation.z = theta + Math.PI/2;
+}
+
+//stop the camera movement loops
+var sentinal = 1;
+function stop()
+{
+	sentinal = 0;
+	setTimeout(function(){sentinal=1;},10);
+}
+
+//reset the camera
+function resetCam()
+{
+	camera.position.x = 0;
+	camera.position.y = 0;
+	camera.position.z = 0;
+	camera.rotation.x = 0;
+	camera.rotation.y = 0;
+	camera.rotation.z = 0;
+	x=0;
+	y=0;
+	z=0;
+	rho = 0;
+	theta = 0;
+	phi = 0;
+	are = 0;
+	zRot.innerHTML = "";
+	yRot.innerHTML = "";
+	xRot.innerHTML = "";
+
+}
+
+//switches the views
+var buttons = document.getElementById('buttons');
+</script>
+</body>
+</html>

@@ -1,0 +1,279 @@
+<html>
+<head>
+<style>
+/**{
+	font-family: "Comic Sans MS";
+}*/
+div{
+	position: absolute;
+	border-radius: 500px;
+	text-align: center;
+	overflow: hidden;
+	color: black;
+	font-size: 14pt;
+}
+#stuff{
+	position: absolute;
+	top: 0px;
+	left:0px;
+	font-size: 14px;
+	z-index:2;
+	text-align: center;
+	color:#000;
+	border-radius: 0px;
+	height:200px;
+}
+#border{
+	position: absolute;
+	width:0px;
+	height:0px;
+	top:0px;
+	left:0px;
+	background-color: #000;
+	border-radius: 0px;
+}
+</style>
+</head>
+<body onload="boxmove(), makebox()">
+<div id="stuff">
+<button type="button" onclick="addbox()">Add A Box!</button>
+<br>
+<!--<form id="form">
+<input type="text" placeholder="Horizontal Restraint" name="h"><br>
+<input type="text" placeholder="Vertical Restraint" name="v"><br>
+<button type="button" onclick="changesize()">Change the Sizes!</button>
+</form>-->
+
+<br></div>
+<div id="border">
+<div class="box" onclick="makecolor()"></div>
+</div>
+
+
+<script src="jquery.js"></script>
+<script>
+num=1;
+box = document.getElementsByClassName("box");
+border = document.getElementById('border');
+var writing=0;
+
+//MAKING THE STUFF
+sizesh = screen.availWidth - 1;
+sizesv = document.body.clientHeight;
+width = new Array();
+height = new Array();
+top = new Array();
+left = new Array();
+boxes = new Array();
+numr = new Array();
+numg = new Array();
+numb = new Array();
+z = new Array();
+p = new Array();
+q = new Array();
+s = new Array();
+d = new Array();
+i=0;
+while(i<=num-1)
+{
+	p[i] = 0;
+	q[i] = 0;
+	s[i] = 0;
+	d[i] = 0;
+	i++;
+}
+hex = new Array(numr, numg, numb);
+color = new Array();
+//THE SIZES OF THE WHOLE DANG THING
+// sizesv = screen.availHeight - 100;
+// sizesh = screen.availWidth - 100;
+
+
+function addbox()
+{
+	num++;
+	border.innerHTML += "<div class='box' onclick='makecolor()'></div>";
+	box = document.getElementsByClassName("box");
+	makebox();
+	// boxmove();
+}
+
+
+
+function makebox()
+{
+i=0;
+while(i<=num-1){
+//MAKING SIZES
+// top[i] = Math.round(Math.random()*(sizesv/2)-1)+1;
+// left[i] = Math.round(Math.random()*(sizesh/2-1))+1;
+// height[i] = Math.round(Math.random()*(sizesv - top[i]-1))+1;
+// width[i] = Math.round(Math.random()*(sizesh - left[i]-1))+1;
+height[i] = Math.round(Math.random()*100)+1;
+width[i] = height[i];
+top[i] = Math.round(Math.random()*100)+1;
+left[i] = Math.round(Math.random()*100)+1;
+z[i] = Math.round(-( width[i] * height[i]));
+box[i].style.zIndex = z[i];
+
+
+//COLORS!!!
+numr[i] = Math.round(Math.random()*14+1);
+numg[i] = Math.round(Math.random()*14+1);
+numb[i] = Math.round(Math.random()*14+1);
+
+dd=0;
+while(dd<=2){
+	if(hex[dd][i] == 10){hex[dd][i] = "a";}
+	else if(hex[dd][i] == 11){hex[dd][i] = "b";}
+	else if(hex[dd][i] == 12){hex[dd][i] = "c";}
+	else if(hex[dd][i] == 13){hex[dd][i] = "d";}
+	else if(hex[dd][i] == 14){hex[dd][i] = "e";}
+	else if(hex[dd][i] == 15){hex[dd][i] = "f";}
+dd++;
+}
+
+color[i] = "#" + numr[i] + numg[i]+ numb[i];
+box[i].style.backgroundColor = color[i];
+
+
+//SETTING SIZES
+border.style.width = '100%';
+border.style.height = '100%';
+box[i].style.left = left[i] + '%';
+box[i].style.width = width[i] + '%';
+box[i].style.height = height[i] + '%';
+box[i].style.top = top[i] + '%';
+box[i].style.fontSize = height[i] + "px";
+
+//MOVEMENT FUNCTIONS
+p[i]=left[i];
+q[i]=top[i];
+d[i]=true;
+s[i]=true;
+
+// MESSING WITH z-index
+// areas[i] = width[i]*height[i];
+//END OF BIG EFFIN LOOP
+i++;
+}
+// fixz();
+border.style.zIndex = z[num-1]-1;
+//end of makebox
+}
+
+function makecolor()
+{
+	hex = new Array();
+	hex[0] = Math.round(Math.random()*14+1);
+	hex[1] = Math.round(Math.random()*14+1);
+	hex[2] = Math.round(Math.random()*14+1);
+	dd=0;
+	while(dd<=2)
+	{
+		if(hex[dd] == 10){hex[dd] = "a";}
+		else if(hex[dd] == 11){hex[dd] = "b";}
+		else if(hex[dd] == 12){hex[dd] = "c";}
+		else if(hex[dd] == 13){hex[dd] = "d";}
+		else if(hex[dd] == 14){hex[dd] = "e";}
+		else if(hex[dd] == 15){hex[dd] = "f";}
+		dd++;
+	}
+	color = "#" + hex[0] + hex[1] + hex[2];
+	this.style.backgroundColor = color;
+	border.style.color = '#fff';
+	border.innerHTML = color;
+	this.innerHTML = color;
+}
+
+function fixz()
+{
+areas.sort(function(a,b){return b-a});
+x = 0;
+w = 0;
+z=1;
+while(x<=num-1)
+{
+	while(w<=num-1)
+	{
+		if(width[w]*height[w] == areas[x-1])
+		{
+			box[w].style.zIndex = z + "px";
+			box[w].innerHTML = z;
+			z++;
+		}
+		w++;
+	}
+w = 1;
+x++;
+}
+}
+
+function boxmove(){
+i=0;
+while(i<=num-1)
+{
+box[i].style.left = p[i] + "px";
+box[i].style.top = q[i] + "px";
+// stuff.innerHTML = box[i].style.left + " " + box[i].style.width + " " + box[i].style.height + " " + box[i].style.top;
+//horizontal movement
+	if(d[i] == true)
+	{
+		if(p[i] + width[i] == sizesh)
+		{
+			d[i]=false;
+		}
+		else if(p[i]>=0)
+		{
+			p[i]++;
+		}
+	}
+	else if(d[i] == false)
+	{
+		if(p[i] == 0)
+		{
+			d[i]=true;
+		}
+		else if(p[i] + width[i]<=sizesh)
+		{
+			p[i]--;
+		}
+	}
+//vertical movement
+	if(s[i] == true)
+	{
+		if(q[i] + height[i] == sizesv)
+		{
+			s[i]=false;
+		}
+		else if(q[i]>=0)
+		{
+			q[i]++;
+		}
+	}
+	else if(s[i] == false)
+	{
+		if(q[i] == 0)
+		{
+			s[i]=true;
+		}
+		else if(q[i] + height[i]<=sizesv)
+		{
+			q[i]--;
+		}
+	}
+
+	//end of loop
+
+	i++;
+}
+	setTimeout(boxmove,10);
+// end of function boxmove()
+}
+
+
+
+
+</script>
+</body>
+</hmtl>

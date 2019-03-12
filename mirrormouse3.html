@@ -1,0 +1,224 @@
+<html>
+<head>
+<style>
+	#stuff
+	{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+		z-index: 5;
+		color: white;
+		font-family: Courier New;
+	}
+
+	#canvas
+	{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+	}
+
+	*
+	{
+		font-family: Courier New;
+		cursor:default;
+	}
+
+
+</style>
+<title>GRJF`S TESTING PAGE</title>
+<link rel="icon" type="image/ico" href="freak.ico" />
+</head>
+<body onkeydown="keyBooleans()" onkeyup="keyBooleans()" onmousedown="keyBooleans()" onmousemove="keyBooleans()" onmouseup="keyBooleans()">
+<div style="text-align:center;top:40%;position:absolute;width:99%;z-index:4;" id="startLink"><h1 style="color:white;cursor:default"><span id="linkThing">Input a number<br>Hit Enter then spin around<br>Click and drag around</span></h1></div>
+<div id="stuff">
+	<!-- <button onclick="ctx.clearRect(0,0,pageWidth,pageHeight)">Clear Canvas</button><br> -->
+	<form id="form" action="saveCanvas.php" method="post"><input type="hidden" name="picture"><button type="button" onclick="save()">Save Canvas</button></form>
+</div>
+<canvas id="canvas"></canvas>
+<script src="canvasLibrary.js"></script>
+<script src="utilityLibrary.js"></script>
+<script src="colorFuns.js"></script>
+<script src="vector.js"></script>
+<script>
+var pageHeight = document.body.clientHeight;
+var pageWidth = document.body.clientWidth;
+var canvas = get("canvas");
+var ctx = canvas.getContext("2d");
+var utilLib = new UtilityLibrary();
+ctx.canvas.height = pageHeight;
+ctx.canvas.width = pageWidth;
+var keys = [];
+var mouseX = 0;
+var mouseY = 0;
+var stopped = false;
+var prevPoints = [];
+var first = true;
+var firstType = utilLib.getBooleanLock();
+var going = false;
+ctx.strokeStyle = "white";
+var axisVectors = [];
+var axes = 0;
+var canEnter = false;
+var mouseVector = new Vector(pageWidth/2, pageHeight/2, 0, 0);
+drawAll();
+blackCanvas();
+
+function get(id)
+{
+	return document.getElementById(id);	
+}
+
+function getClasses(clas)
+{
+	return document.getElementsByClassName(clas);
+}
+
+function save()
+{
+	get("form").picture.value = canvas.toDataURL();
+	get("form").submit();
+}
+
+function write(stuff)
+{
+	get("stuff").innerHTML = stuff;
+}
+
+function init()
+{
+	if(get("linkThing").innerHTML == "")
+	{
+		alert("Please type a number");
+		return;
+	}
+	axes = 0+get("linkThing").innerHTML;
+	get("startLink").style.display = "none";
+	for(var i = 0; i < axes; i++)
+	{
+		axisVectors.push( new Vector(pageWidth/2, pageHeight/2, pageWidth/2 + Math.cos(Math.PI/axes * i + Math.PI/2)*100, pageHeight/2 + Math.sin(Math.PI/axes * i + Math.PI/2)*100));
+	}
+	going = true;
+}
+
+function drawAll()
+{
+	if(!first && going)
+	{
+		var points = [];
+		points.push({x: mouseX, y: mouseY});
+		var current;
+		var prev = mouseVector.returnCopy();
+		for(var i = 0; i < axes*2 - 1; i++)
+		{
+			current = axisVectors[i%axes].returnCopy();
+			current.rotate(-1 * prev.angleBetween(axisVectors[i%axes]));
+			current.scale(mouseVector.distance());
+			points.push({
+				x: current.final.x,
+				y: current.final.y
+			});
+			prev = current;
+		}
+ 		
+ 		if(prevPoints.length != 0)
+			for(var i in points)
+				drawLine(points[i], prevPoints[i]);
+		// for(var i in axisVectors)
+		// 	axisVectors[i].draw();
+
+		prevPoints = points;
+	}
+}
+
+function drawLine(first, second)
+{
+	ctx.beginPath();
+	ctx.moveTo(first.x, first.y);
+	ctx.lineTo(second.x, second.y);
+	ctx.stroke();
+}
+
+function keyBooleans()
+{
+	if(event.type=="keydown")
+	{
+		firstType.true();
+		if(keys[event.which] == undefined)
+			keys[event.which] = utilLib.getBooleanLock();
+		keys[event.which].true();
+	}
+
+	else if(event.type == "keyup")
+	{
+		keys[event.which].unlock();		
+	}
+
+	// else if(event.type == "mousedown")
+	// 	keys["mousedown"] = true;
+
+	// else if(event.type == "mouseup")
+	// 	keys["mousedown"] = false;
+	else if(event.type == "mousemove")
+	{
+		mouseX = event.x;
+		mouseY = event.y;
+		mouseVector.final = {x: mouseX, y: mouseY};
+	}
+	else if(event.type == "mousedown")
+	{
+		prevPoints = [];
+		first = false;
+	}
+	else if(event.type == "mouseup")
+	{
+		prevPoints = [];
+		first = true;
+	}
+}
+
+function render()
+{
+	// blackCanvas();
+	if(!going)
+	{
+		if(firstType != undefined && firstType.value)
+		{
+			get("linkThing").innerHTML = "";
+			firstType.lockFalse();
+		}
+
+		for(var i = 96; i <= 105; i++)
+		{
+			if(keys[i] != undefined && keys[i].value)
+			{
+				get("linkThing").innerHTML += i-96;
+				keys[i].lockFalse();
+			}
+			if(keys[i-48] != undefined && keys[i-48].value)	
+			{
+				get("linkThing").innerHTML += i-96;
+				keys[i-48].lockFalse();
+			}
+		}
+		if(keys[8] != undefined && keys[8].value)
+		{
+			get("linkThing").innerHTML = get("linkThing").innerHTML.substr(0,get("linkThing").innerHTML.length-1);
+			keys[8].lockFalse();
+		}
+
+		if(keys[13] != undefined && keys[13].value)
+		{
+			keys[13].lockFalse();
+			init();
+		}
+	}
+
+	drawAll();
+	setTimeout(render,10);
+}
+render();
+
+</script>
+</body>
+</html>

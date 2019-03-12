@@ -1,0 +1,225 @@
+<html>
+<head>
+<link rel="icon" type="image/ico" href="freak.ico" />
+<title>	
+	This is borken right now. Just like the word "borken."
+</title>
+<style>
+/**{
+	font-family: "Comic Sans MS";
+}*/
+
+body
+{
+	background-color: black;
+}
+
+div{
+	position: absolute;
+	/*border-radius: 500px;*/
+	text-align: center;
+	overflow: hidden;
+}
+#stuff{
+	position: absolute;
+	top: 0px;
+	left:0px;
+	font-size: 14px;
+	z-index:2;
+	text-align: center;
+	color:#000;
+	border-radius: 0px;
+	height:200px;
+}
+#border{
+	position: absolute;
+	width:0px;
+	height:0px;
+	top:0px;
+	left:0px;
+	background-color: #000;
+	border-radius: 0px;
+}
+*{
+	font-family: Courier New;
+}
+
+#ok{
+	position: absolute;
+	top:100px;
+	left:0px;
+}
+
+/*.box{
+	background-color: blue;
+}*/
+
+
+</style>
+</head>
+<body onload="boxmove(), makebox()">
+<div id="stuff">
+<input type="text" placeholder="How Many Boxes would you like?" name="num" id="inputBoxesNum">
+<button type="button" onclick="addbox()">Add A Boxes!</button>
+<br>
+
+
+<br></div>
+<div id="border">
+<div id="ok"></div>
+<div class="box"><div class="eye"></div></div>
+</div>
+
+
+<script src="jquery.js"></script>
+<script>
+num=1;
+box = document.getElementsByClassName("box");
+eyes = document.getElementsByClassName("eye");
+border = document.getElementById('border');
+
+//MAKING THE STUFF
+width = new Array();
+height = new Array();
+top = new Array();
+left = new Array();
+boxes = new Array();
+z = new Array();
+p = new Array();
+q = new Array();
+s = new Array();
+d = new Array();
+color = new Array();
+numr = new Array();
+numg = new Array();
+numb = new Array();
+//THE SIZES OF THE WHOLE DANG THING
+sizesv = screen.availHeight - 100;
+sizesh = screen.availWidth - 50;
+
+
+function addbox()
+{
+	num = document.getElementById('inputBoxesNum').value;
+	border.innerHTML = '';
+	j=0;
+	while(j<=num-1)
+	{
+		border.innerHTML += "<div class='box'><div class=\"eye\"></div></div>";
+		j++;
+	}
+	box = document.getElementsByClassName("box");
+	makebox();
+	// boxmove();
+}
+
+
+
+function makebox()
+{
+i=0;
+while(i<=num-1){
+//MAKING SIZES
+top[i] = Math.round(Math.random()*(sizesv/2)-1)+1;
+left[i] = Math.round(Math.random()*(sizesh/2-1))+1;
+height[i] = Math.round(Math.random()*(sizesv - top[i]-1))+1;
+width[i] = height[i];
+z[i] = Math.round(-( width[i] * height[i]));
+box[i].style.zIndex = z[i];
+
+
+// COLORS!!!
+
+//SETTING SIZES
+border.style.width = sizesh;
+border.style.height = sizesv;
+box[i].style.left = left[i] + 'px';
+box[i].style.width = width[i] + 'px';
+box[i].style.height = height[i] + 'px';
+box[i].style.top = top[i] + 'px';
+
+//MOVEMENT FUNCTIONS
+p[i]=left[i];
+q[i]=top[i];
+d[i] = Math.round(Math.random());
+s[i] = Math.round(Math.random());
+
+// box[i].innerHTML = '<img src="download.jpg">';
+
+//END OF BIG EFFIN LOOP
+i++;
+}
+
+border.style.zIndex = z[num-1]-1;
+//end of makebox
+}
+
+function boxmove(){
+i=0;
+while(i<=num-1)
+{
+box[i].style.backgroundColor = 'rgb('+Math.round(Math.random()*255)+', '+Math.round(Math.random()*255)+', '+Math.round(Math.random()*255)+')';
+box[i].style.left = p[i] + "px";
+box[i].style.top = q[i] + "px";
+// stuff.innerHTML = box[i].style.left + " " + box[i].style.width + " " + box[i].style.height + " " + box[i].style.top;
+//horizontal movement
+	if(d[i] == 0)
+	{
+		if(p[i] + width[i] == sizesh)
+		{
+			d[i]=1;
+		}
+		else if(p[i]>=0)
+		{
+			p[i]++;
+		}
+	}
+	else if(d[i] == 1)
+	{
+		if(p[i] == 0)
+		{
+			d[i]=0;
+		}
+		else if(p[i] + width[i]<=sizesh)
+		{
+			p[i]--;
+		}
+	}
+//vertical movement
+	if(s[i] == 0)
+	{
+		if(q[i] + height[i] == sizesv)
+		{
+			s[i]=1;
+		}
+		else if(q[i]>=0)
+		{
+			q[i]++;
+		}
+	}
+	else if(s[i] == 1)
+	{
+		if(q[i] == 0)
+		{
+			s[i]=0;
+		}
+		else if(q[i] + height[i]<=sizesv)
+		{
+			q[i]--;
+		}
+	}
+
+	//end of loop
+
+	i++;
+}
+	setTimeout(boxmove,10);
+// end of function boxmove()
+}
+
+
+
+
+</script>
+</body>
+</hmtl>

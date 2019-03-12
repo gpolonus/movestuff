@@ -1,0 +1,60 @@
+<html>
+<head>
+<style>
+	#stuff
+	{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+		z-index: 5;
+	}
+
+	#canvas
+	{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+	}
+</style>
+</head>
+<body>
+<div id="stuff">
+	<button onclick="ctx.clearRect(0,0,pageWidth,pageHeight)">Clear Canvas</button><br>
+	Outer Teeth Radians: &pi;/<input type="text" class="loopAngle" value="160" onchange="ctx.clearRect(0,0,pageWidth,pageHeight)"><br>
+	Ratio of Inner Radius to Outer: (pageHeight)*<input type="text" class="loopAngle" value="2" onchange="ctx.clearRect(0,0,pageWidth,pageHeight)">/<input type="text" class="loopAngle" value="3" onchange="ctx.clearRect(0,0,pageWidth,pageHeight)"><br>
+</div>
+<canvas id="canvas"></canvas>
+<script src="canvasLibrary.js"></script>
+<script>
+var pageHeight = document.body.clientHeight;
+var pageWidth = document.body.clientWidth;
+var canvas = get("canvas");
+var ctx = canvas.getContext("2d");
+ctx.canvas.height = pageHeight;
+ctx.canvas.width = pageWidth;
+
+function get(id)
+{
+	return document.getElementById(id);	
+}
+
+function getClasses(clas)
+{
+	return document.getElementsByClassName(clas);
+}
+
+var point = {x:0,y:0,innerAngle:0,outerAngle:0};
+function run()
+{
+	point.outerAngle += Math.PI/getClasses("loopAngle")[0].value;
+	radius = getClasses("loopAngle")[1].value / getClasses("loopAngle")[2].value;
+	point.innerAngle += 2 / getClasses("loopAngle")[0].value * radius;
+	point.x = pageWidth/2 + Math.cos(point.outerAngle)*(pageHeight/2-radius*pageHeight/2) - Math.cos(point.innerAngle)*(radius*pageHeight/2);
+	point.y = pageHeight/2 + Math.sin(point.outerAngle)*(pageHeight/2-radius*pageHeight/2) - Math.sin(point.innerAngle)*(radius*pageHeight/2);
+	drawDiscatCenter(point.x,point.y,5,"black");
+	setTimeout(run,1);
+}
+run();
+</script>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<html>
+<head>
+<style>
+	#stuff
+	{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+		z-index: 5;
+	}
+
+	#canvas
+	{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+	}
+</style>
+<title>GRJF`S TESTING PAGE</title>
+<link rel="icon" type="image/ico" href="freak.ico" />
+</head>
+<body onkeydown="keyBooleans()" onkeyup="keyBooleans()" onmousedown="keyBooleans()" onmousemove="keyBooleans()">
+<div id="stuff">
+<span id="1"></span><br>
+<span id="2"></span>
+</div>
+<canvas id="canvas"></canvas>
+<script src="canvasLibrary.js"></script>
+<script src="colorFuns.js"></script>
+<script src="vector.js"></script>
+<script>
+var pageHeight = document.body.clientHeight;
+var pageWidth = document.body.clientWidth;
+var canvas = get("canvas");
+var ctx = canvas.getContext("2d");
+ctx.canvas.height = pageHeight;
+ctx.canvas.width = pageWidth;
+var keys = [];
+var mouseX = 0;
+var mouseY = 0;
+var start = false;
+ctx.strokeStyle = "black";
+
+// var v = new Vector(pageWidth/2, 100, 300, 600);
+// var v2 = new Vector(v.init.x, v.init.y, v.init.x, v.distance()+v.init.y);
+// var v3 = new Vector(v.final.x, v.final.y, v2.final.x, v2.final.y);
+var w = new Vector(pageWidth/2, pageHeight/2, pageWidth/2 + 630, pageHeight/2);
+// var u = new Vector(v.init.x, v.init.y, 0,0);
+// var u2 = new Vector(v.init.x, v.init.y, w.init.x, w.init.y);
+// var v = new Vector(pageWidth/2, pageHeight/2, pageWidth/2 + Math.cos(Math.PI/3)*100, pageHeight/2 + Math.sin(Math.PI/3)*100);
+var v = new Vector(pageWidth/2, pageHeight/2, pageWidth/2 + Math.cos(Math.PI/3)*100, pageHeight/2);
+
+Number.prototype.mod = function(n)
+{
+	return ((this%n)+n)%n;
+}
+
+function get(id)
+{
+	return document.getElementById(id);	
+}
+
+function getClasses(clas)
+{
+	return document.getElementsByClassName(clas);
+}
+
+function drawAll(x, y)
+{
+	w.final = {x: x, y: y};
+	v.draw("black");
+	w.draw("blue");
+	// u.final = {x: x, y: y};
+	// v.draw();
+	// v2.draw();
+	// v3.draw();
+	// w.draw();
+	// u.draw();
+	// u2.draw();
+	// get("stuff").innerHTML = Math.acos(u2.dot(v)/(u2.distance() * v.distance()))/Math.PI*180+
+	// 	"<br>"+Math.acos(u.dot(u2)/(u.distance() * u2.distance()))/Math.PI*180;
+		// "<br>"+Math.acos(u.dot(w)/(w.distance() * u.distance()))/Math.PI*180;
+	get("1").innerHTML = v.angleBetween(w)*180/Math.PI;
+	get("2").innerHTML = w.angleToOrigin()*180/Math.PI;
+}
+
+function keyBooleans()
+{
+	// speed++;
+	if(event.type=="keydown")
+	{
+		keys[event.which] = true;
+	}
+
+	else if(event.type == "keyup")
+	{
+		keys[event.which] = false;		
+	}
+
+	// else if(event.type == "mousedown")
+	// 	keys["mousedown"] = true;
+
+	// else if(event.type == "mouseup")
+	// 	keys["mousedown"] = false;
+	else if(event.type == "mousemove")
+	{
+		mouseX = event.x;
+		mouseY = event.y;
+	}
+	// else if(event.type == "mousedown")
+	// 	start = !start;
+}
+
+function render()
+{
+	whiteCanvas();
+	if(start)
+	{
+
+	}
+	else
+	{
+		drawAll(mouseX, mouseY);
+	}
+
+	setTimeout(render,10);
+}
+render();
+</script>
+</body>
+</html>

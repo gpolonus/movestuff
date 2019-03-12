@@ -1,0 +1,55 @@
+<html>
+<head>
+<title>
+	This is weird.
+</title>
+<style>
+div
+{
+	position: absolute;
+}
+canvas
+{
+	position: absolute;
+	top:0px;
+	left:0px;
+}
+</style>
+</head>
+<body background="black" onclick="ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height)">
+<canvas id="canvas" onmousemove="work(sent)"></canvas>
+<script src="canvasLibrary.js"></script>
+<script>
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext("2d");
+var lastPoints = new Array();
+var sent = false;
+
+function init()
+{
+	ctx.canvas.width = document.body.clientWidth;
+	ctx.canvas.height = document.body.clientHeight;
+	lastPoints[1] = {x:-1,y:-1};
+}
+init();
+
+function work()
+{
+	if(lastPoints[1].x == -1)
+		lastPoints[1] = {x:event.clientX,y:event.clientY};
+	else
+		lastPoints[0] = lastPoints[1];
+	lastPoints[1] = {x:event.clientX,y:event.clientY};
+	l = Math.abs(event.clientX-lastPoints[0].x);
+	drawFillSquare(event.clientX-l/2,event.clientY-l/2,l,rgb(l,l,l));
+	// ctx.fillStyle = rgb(lastPoints[1].y / document.body.clientHeight * 255 , lastPoints[1].x / document.body.clientWidth * 255 , (lastPoints[0].x - lastPoints[1].x) * (lastPoints[0].y - lastPoints[1].y) / document.body.clientHeight / document.body.clientWidth * 255 * 255);
+	// ctx.fillStyle = randomColor();
+	// ctx.beginPath();
+	// ctx.rect(lastPoints[1].x,lastPoints[1].y,lastPoints[0].x - lastPoints[1].x,lastPoints[0].y - lastPoints[1].y);
+	// ctx.closePath();
+	// ctx.fill();
+}
+
+</script>
+</body>
+</html>

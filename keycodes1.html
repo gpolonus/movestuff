@@ -1,0 +1,45 @@
+<html>
+<head>
+<title>This shit is supposed to move.</title>
+<style>
+#thing
+{
+	position: fixed;
+	background-color: blue;
+	height: 250px;
+	width: 250px;
+	top:100px;
+	left:100px;
+}
+</style>
+
+</head>
+<body>
+<div id="thing"></div>
+<script>
+var thin = document.getElementById('thing');
+//DOING STUFF 
+var i = 0;
+set = setInterval(function()
+{
+	// document.body.innerHTML += i++ + "<br>";
+	// if(window.event)
+	// {
+	// 	if(window.event.keyCode == 32)
+	// 	{
+	// 		thin.innerHTML = "STUFF";
+	// 	}
+	// }
+	window.body.onkeydown = checkKey(window.event);
+}, 10);
+
+function checkKey(e) {
+    var event = window.event ? window.event : e;
+    if (true) {
+        alert(event.keyCode)
+    }
+}
+
+</script>
+</body>
+</html>

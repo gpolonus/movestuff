@@ -1,0 +1,165 @@
+<html>
+<head>
+	<style>
+	canvas
+	{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+		z-index: -3;
+	}
+	</style>
+</head>
+<body onkeydown="keyBooleans()" onkeyup="keyBooleans()">
+<div id="keyCodes"></div>
+<canvas id="canvas"></canvas>
+<script src="colorFuns.js"></script>
+<script src="drawnFunctions.js"></script>
+<script src="canvasLibrary.js"></script>
+<script>
+
+
+var keys = new Array();
+for(i=1;i<150;i++)
+	keys[i] = false;
+var leftPX = 0;
+var topPX = 0;
+var speed = 2;
+var dogHeight = 63;
+var dogLength = 100;
+var canvas = get("canvas");
+var ctx = canvas.getContext("2d");
+ctx.canvas.height = document.body.clientHeight-30;
+ctx.canvas.width = document.body.clientWidth-30;
+ctx.font = "14px Arial";
+
+function get(id)
+{
+	return document.getElementById(id);
+}
+
+function nothing(){}
+
+function showKeyCode()
+{
+	get("keyCodes").innerHTML = "<h1 style='color:blue;'>"+topPX+'</h1>';
+}
+
+var direction = false;
+// var dogLength = 200;
+// var dogHeight = 126;
+var state = "falling";
+var level = new Array();
+var jumpFrame = 0;
+var gaps = 30;
+var realityPos = 0;
+for(i=0;i<document.body.clientWidth-30;i+=gaps)
+	level[i] = document.body.clientHeight - Math.round(Math.random()*100)-100;
+function render()
+{
+	whiteCanvas();
+
+	exactPos = leftPX;
+	position = exactPos-exactPos%gaps;
+
+	if(state == "falling")
+	{
+		if(topPX  <  (level[position+gaps]-level[position])/gaps*(exactPos - position)+level[position])
+		{
+			topPX += speed;
+		}
+		else
+		{ 
+			topPX = (level[position+gaps]-level[position])/gaps*(exactPos - position)+level[position];
+			state = "walking";
+		}
+
+		if(keys[65] || keys[68])
+		{
+			leftPX += keys[65] ? -2 : 2;
+			direction = keys[65];
+		}
+	}
+	else if (state == "walking")
+	{
+		if(keys[65] || keys[68])
+		{
+			dir = keys[65] ? -1 : 1;
+			topPX += dir*(level[position+gaps]-level[position])/gaps*speed;
+			leftPX += keys[65] ? -1*speed : speed;
+			realityPos += keys[65] ? -1*speed : speed;
+			direction = keys[65];
+		}
+
+		if(keys[87])
+			state = "jumping";
+	}
+	else if(state == "jumping")
+	{
+		if(jumpFrame == 0)
+			jumpFrame++;
+		else if(jumpFrame > 0 && jumpFrame < 50)
+		{
+			topPX -= (-2*jumpFrame + 250)/50;
+			jumpFrame += 2;
+		}
+		else
+		{
+			jumpFrame = 0;
+			state = "falling";
+		}
+
+		if(keys[65] || keys[68])
+		{
+			leftPX += keys[65] ? -2 : 2;
+			direction = keys[65];
+		}
+	}
+
+	// make the dogThing walk
+	// dirColor = direction ? "blue" : "red";
+	// drawFillSquare(leftPX-10,topPX-10,20,dirColor);
+	showKeyCode();
+	// drawFillSquare(leftPX+dogLength/2,topPX+130,-1*gaps,"#0ff");
+
+	// draw the level
+	// drawFillSquare(100,500,1000,"blue");
+	desertBackground(0,0,document.body.clientWidth-30);
+	dogThing(leftPX-dogLength/2,topPX-dogHeight,dogLength,direction,ctx);
+	ctx.fillStyle = rgb(250,150,100);
+	ctx.beginPath();
+	ctx.moveTo(0,level[0]);
+	for(i=gaps;i<document.body.clientWidth-30;i+=gaps)
+	{
+		ctx.lineTo(i,level[i]);
+		// ctx.fillText(level[i],i,level[i]);
+	}
+	ctx.lineTo(document.body.clientWidth,document.body.clientHeight);
+	ctx.lineTo(0,document.body.clientHeight);
+	ctx.closePath();
+	ctx.fill();
+
+
+	setTimeout(render,10);
+}
+render();
+
+function keyBooleans()
+{
+	// speed++;
+	if(event.type=="keydown")
+	{
+		keys[event.which] = true;
+	}
+
+	else if(event.type == "keyup")
+	{
+		keys[event.which] = false;		
+	}
+	// if(!(keyA || keyD || keyW || keyS))
+	// 	speed = 0;	
+}
+
+</script>
+</body>
+</html>

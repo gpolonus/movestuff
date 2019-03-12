@@ -1,0 +1,98 @@
+<html>
+<head>
+<title>Puzzle</title>
+<style>
+.one1{
+	position:absolute;
+	z-index:1;
+	top:200px;
+	left:100px;
+	width:200px;
+	height:100px;
+	background-color: #000;
+	}
+.one2{
+	position:absolute;
+	z-index:5;
+	top:300px;
+	left:100px;
+	width:200px;
+	height:100px;
+	background-color: #000;
+	}
+.two{
+	position:absolute;
+	z-index:2;
+	top:100px;
+	left:200px;
+	width:200px;
+	height:200px;
+	background-color: #f00;
+	}
+.three{
+	position:absolute;
+	z-index:3;
+	top:200px;
+	left:300px;
+	width:200px;
+	height:200px;
+	background-color: #0f0;
+	}
+.four{
+	position:absolute;
+	z-index:4;
+	top:300px;
+	left:200px;
+	width:200px;
+	height:200px;
+	background-color: #00f;
+	}
+
+</style>
+</head>
+<body>
+<div class="one1"></div>
+<div class="two"></div>
+<div class="three"></div>
+<div class="four"></div>
+<div class="one2"></div>
+<script src="jquery.js"></script>
+
+<script>
+$(document).ready( function(){
+	i = 5;
+
+		$('.one1').mouseover(function(){
+		$('.one1').css('z-index',i);
+		$('.one2').css('z-index',i);
+		i++;
+		$(".two").text(i-5);
+	});
+		$('.two').mouseover(function(){
+		$('.two').css('z-index',i);
+		i++;	
+		$(".two").text(i-5);
+	});
+		$('.three').mouseover(function(){
+		$('.three').css('z-index',i);
+		i++;	
+		$(".two").text(i-5);
+	});
+		$('.four').mouseover(function(){
+		$('.four').css('z-index',i);
+		i++;	
+		$(".two").text(i-5);
+	});
+		$('.one2').mouseover(function(){
+		$('.one2').css('z-index',i);
+		$('.one1').css('z-index',i);
+		i++;	
+		$(".two").text(i-5);
+	});
+		$('.one2').dblclick(function(){
+		$(".one2").css('z-index',1);
+	});
+});
+</script>
+</body>
+</html>

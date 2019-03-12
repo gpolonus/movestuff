@@ -1,0 +1,39 @@
+<html>
+<body>
+	<div></div>
+<script>
+p0 = 0;
+p1 = 0.48;
+error = Math.pow(10,-5);
+function f(x)
+{
+	return Math.pow((Math.exp(x)-2),2);
+;
+}
+
+div = document.getElementsByTagName("div")[0];
+
+div.innerHTML += f(p0) + "<br>" + f(p1) + "<br>";
+
+i=0;
+j=2;
+while(i == 0)
+{
+	j++;
+
+	p = p0 - ( f(p0) * ( p1 - p0 ) ) / ( f(p1) - f(p0) );
+
+	if(Math.abs(p - p0) < error || j == 1000)
+
+	{
+		i++;
+	}
+
+	div.innerHTML += "<br><br>" + (j-1) + "<br>" + p + "<br>" + f(p);
+
+	p0 = p;
+}
+
+</script>
+</body>
+</html>

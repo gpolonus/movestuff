@@ -1,0 +1,289 @@
+<html>
+<head>
+<style>
+	#stuff
+	{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+		z-index: 5;
+	}
+
+	#canvas
+	{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+	}
+</style>
+<title>GRJF`S TESTING PAGE</title>
+<link rel="icon" type="image/ico" href="freak.ico" />
+</head>
+<body onkeydown="keyBooleans()" onkeyup="keyBooleans()" onmousedown="keyBooleans()" onmousemove="keyBooleans()">
+<div id="stuff">
+	<!-- <button onclick="ctx.clearRect(0,0,pageWidth,pageHeight)">Clear Canvas</button><br> -->
+</div>
+<canvas id="canvas"></canvas>
+<script src="canvasLibrary.js"></script>
+<script src="colorFuns.js"></script>
+<script>
+var pageHeight = document.body.clientHeight;
+var pageWidth = document.body.clientWidth;
+var canvas = get("canvas");
+var ctx = canvas.getContext("2d");
+ctx.canvas.height = pageHeight;
+ctx.canvas.width = pageWidth;
+var keys = [];
+var mouseX = 0;
+var mouseY = 0;
+var start = false;
+var points = [];
+// drawAll();
+ctx.strokeStyle = "black";
+// var num = 7;
+// for(var i = 0; i < num; i++)
+// {
+// 	points.push({x: Math.cos(Math.PI*2/num*(num-i))*200 + pageWidth/2, y: Math.sin(Math.PI/num*2*(num-i))*200 + pageHeight/2});
+// }
+
+Number.prototype.mod = function(n)
+{
+	return ((this%n)+n)%n;
+}
+
+function get(id)
+{
+	return document.getElementById(id);	
+}
+
+function getClasses(clas)
+{
+	return document.getElementsByClassName(clas);
+}
+
+function drawAll()
+{
+	drawPoints();
+	var pp = points;
+	var v;
+	if(points.length > 0)
+	{
+		for(var i = 0; i < 15; i++)
+			pp = drawNextLine(pp);
+		// for(var i = 0; i < pp.length; i++)
+		// {
+		// 	v = new Vector(pp[i].x, pp[i].y, points[i].x, points[i].y);
+		// 	v.draw("blue");
+		// }
+	}
+}
+
+function drawPoints()
+{
+	if(points.length <= 0)
+		return;
+	ctx.beginPath();
+	ctx.moveTo(points[0].x, points[0].y);
+	for(var i = 1; i < points.length; i++)
+		ctx.lineTo(points[i].x, points[i].y);
+	ctx.closePath();
+	ctx.stroke();
+}
+
+function drawNextLine(p)
+{
+	var v;
+	var vp;
+	var pp = [];
+	var direction = p[0].x > p[1].x ? false : true;
+	ctx.beginPath();
+	var first = true;
+	for(var i = 0; i < p.length; i++)
+	{
+		v = new Vector(p[(i - 1).mod(p.length)].x, p[(i - 1).mod(p.length)].y, p[(i + 1)%p.length].x, p[(i + 1)%p.length].y);
+		vp = v.perpVec(p[i%p.length].x, p[i%p.length].y,10);
+		if(direction)
+			vp.invert();
+		pp.push({x: vp.final.x, y: vp.final.y});
+		if(first)
+		{
+			ctx.moveTo(pp[i].x, pp[i].y);
+			first = false;
+		}
+		else
+			ctx.lineTo(pp[i].x, pp[i].y);
+	}
+	ctx.closePath();
+	ctx.stroke();
+	return pp;
+}
+
+function keyBooleans()
+{
+	// speed++;
+	if(event.type=="keydown")
+	{
+		keys[event.which] = true;
+	}
+
+	else if(event.type == "keyup")
+	{
+		keys[event.which] = false;		
+	}
+
+	// else if(event.type == "mousedown")
+	// 	keys["mousedown"] = true;
+
+	// else if(event.type == "mouseup")
+	// 	keys["mousedown"] = false;
+	else if(event.type == "mousemove")
+	{
+		mouseX = event.x;
+		mouseY = event.y;
+	}
+	else if(event.type == "mousedown")
+		start = !start;
+}
+
+function render()
+{
+	whiteCanvas();
+	if(start)
+	{
+		points.push({x: mouseX, y: mouseY});
+		drawPoints();
+	}
+	else
+	{
+		drawAll();
+	}
+
+	setTimeout(render,10);
+}
+render();
+
+
+function Vector(x, y, x0, y0)
+{
+	this.init = new Point(x, y);
+	this.final = new Point(x0, y0);
+
+	this.distance = function()
+	{
+		return Math.sqrt(Math.pow(this.init.x - this.final.x,2) + Math.pow(this.init.y - this.final.y,2));
+	}
+
+	// returns perpendicular vector from this vector starting at the given coordinates with the same length if not specified
+	this.perpVec = function(x, y, l)
+	{
+		var xx = x;
+		var yy = y;
+		if(x == undefined || y == undefined)
+		{
+			xx = this.init.x;
+			yy = this.init.y;
+		}
+
+		if(l == undefined)
+		{
+			return new Vector(
+				xx,
+				yy, 
+				-1*(this.final.y - this.init.y) + xx,
+				(this.final.x - this.init.x) + yy
+			);
+		}
+		else
+		{
+			return new Vector(
+				xx,
+				yy,
+				-1*(this.final.y - this.init.y)/this.distance()*l + xx,
+				(this.final.x - this.init.x)/this.distance()*l + yy
+			);
+		}
+	}
+
+	this.draw = function(color)
+	{
+		if(color == undefined)
+		{
+			if(this.color == undefined)
+				this.color = randomColor();
+		}
+		else
+			this.color = color;
+		var old = ctx.strokeStyle;
+		ctx.strokeStyle = this.color;
+		ctx.beginPath();
+		ctx.moveTo(this.init.x, this.init.y);
+		ctx.lineTo(this.final.x, this.final.y);
+		ctx.stroke();
+		ctx.strokeStyle = old;
+	}
+
+	this.invert = function()
+	{
+		this.final.x = 2*this.init.x - this.final.x;
+		this.final.y = 2*this.init.y - this.final.y;
+	}
+
+	this.toString = function()
+	{
+		return "init: "+this.init.x + ", " + this.init.y + "; final: " + this.final.x + ", " + this.final.y;
+	}
+
+	// tests if the given vector crosses this vector
+	this.intersect = function(vec)
+	{
+		var v = this;
+
+	}
+
+	// adds the given vector with this one then possible puts it at x, y and makes it l length
+	this.add = function(v, x, y, l)
+	{
+		var xx = x == undefined ? this.init.x : x;
+		var yy = y == undefined ? this.init.y : y;
+		if(l != undefined)
+		{
+			var vv = new Vector(0,0, this.final.x - this.init.x + v.final.x - v.init.x, this.final.y - this.init.y + v.final.y - v.init.y);
+			return new Vector(
+				xx,
+				yy,
+				(this.final.x - this.init.x + v.final.x - v.init.x)/vv.distance()*l + xx,
+				(this.final.y - this.init.y + v.final.y - v.init.y)/vv.distance()*l + yy
+			);
+		}
+		else
+			return new Vector(
+				xx,
+				yy,
+				(this.final.x - this.init.x + v.final.x - v.init.x) + xx,
+				(this.final.y - this.init.y + v.final.y - v.init.y) + yy
+			);			
+	}
+
+	this.newInit = function(x,y)
+	{
+		this.final.x = this.final.x - this.init.x + x;
+		this.final.y = this.final.y - this.init.y + y;
+		this.init.x = x;
+		this.init.y = y;			
+	}
+
+	this.scale = function(l)
+	{
+		this.final.x = (this.final.x - this.init.x)/this.distance()*l + this.init.x;
+		this.final.y = (this.final.y - this.init.y)/this.distance()*l + this.init.y;
+	}
+
+	function Point(x, y)
+	{
+		this.x = x;
+		this.y = y;
+	}
+}
+</script>
+</body>
+</html>

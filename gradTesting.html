@@ -1,0 +1,107 @@
+<html>
+<head>
+<style>
+	#stuff
+	{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+		z-index: 5;
+	}
+
+	#canvas
+	{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+	}
+</style>
+<title>GRJF`S TESTING PAGE</title>
+<link rel="icon" type="image/ico" href="freak.ico" />
+</head>
+<body>
+<div id="stuff">
+	<button onclick="ctx.clearRect(0,0,pageWidth,pageHeight)">Clear Canvas</button><br>
+</div>
+<canvas id="canvas"></canvas>
+<script src="canvasLibrary.js"></script>
+<script src="colorFuns.js"></script>
+<script>
+var pageHeight = document.body.clientHeight;
+var pageWidth = document.body.clientWidth;
+var canvas = get("canvas");
+var ctx = canvas.getContext("2d");
+ctx.canvas.height = pageHeight;
+ctx.canvas.width = pageWidth;
+
+function get(id)
+{
+	return document.getElementById(id);	
+}
+
+function getClasses(clas)
+{
+	return document.getElementsByClassName(clas);
+}
+
+var points = [];
+
+
+// ctx.fillStyle = "#0f0";
+// ctx.beginPath();
+// ctx.moveTo(points[0].x, points[0].y)
+// for(var i = 1; i < 6; i++)
+// {
+// 	ctx.lineTo(points[i].x, points[i].y);
+// }
+// ctx.closePath();
+// ctx.fill();
+
+	ctx.globalAlpha = 0.10;
+// window.onclick = function()
+// {	
+function draw()
+{
+	points = [];
+	for(var i = 0; i < 6; i++)
+	{
+		points.push({x: Math.round(Math.random()*pageWidth), y: Math.round(Math.random()*pageHeight), r: Math.round(Math.random()*200), c: randomColor()});
+		// points.push({x: pageWidth/2 + 350*Math.cos(i*Math.PI/3), y: pageHeight/2 - 350*Math.sin(i*Math.PI/3), r: 350, c: randomColor()});
+	}
+	for(var i = 0; i < 6; i++)
+	{
+		var farthest = points[i];
+		for(var j = 0; j < 6; j++)
+		{
+			if(distance(points[i].x, points[i].y, points[j].x, points[j].y) > distance(points[i].x, points[i].y, farthest.x, farthest.y))
+			{
+				farthest = points[j];
+			}
+		}
+		var grad = ctx.createRadialGradient(points[i].x, points[i].y, points[i].r, farthest.x, farthest.y, farthest.r);
+		// var grad = ctx.createLinearGradient(points[i].x, points[i].y, points[(i+3)%6].x,points[(i+3)%6].y);
+		grad.addColorStop(0, points[i].c);
+		// grad.addColorStop(1,  points[(i+3)%6].c);
+		grad.addColorStop(1,  farthest.c);
+		ctx.fillStyle = grad;
+		ctx.beginPath();
+		ctx.moveTo(points[0].x, points[0].y)
+		for(var j = 1; j < 6; j++)
+		{
+			ctx.lineTo(points[j].x, points[j].y);
+		}
+		ctx.closePath();
+		ctx.fill();
+	}
+	setTimeout(draw, 100);
+}
+draw();
+
+function distance(x0,y0,x1,y1)
+{
+	return Math.sqrt(Math.pow(x0-x1,2)+Math.pow(y0-y1,2));
+}
+
+</script>
+</body>
+</html>

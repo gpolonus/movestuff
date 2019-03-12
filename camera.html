@@ -1,0 +1,201 @@
+<html>
+<head>
+<style>
+	#stuff
+	{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+		z-index: 5;
+	}
+
+	#canvas
+	{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+	}
+</style>
+<title>GRJF`S TESTING PAGE</title>
+<link rel="icon" type="image/ico" href="freak.ico" />
+</head>
+<body onkeydown="keyBooleans()" onkeyup="keyBooleans()" onmousedown="keyBooleans()" onmousemove="keyBooleans()">
+<div id="stuff">
+	<!-- <button onclick="ctx.clearRect(0,0,pageWidth,pageHeight)">Clear Canvas</button><br> -->
+	<span id="printout" style="color:white"></span>
+</div>
+<canvas id="canvas"></canvas>
+<script src="canvasLibrary.js"></script>
+<script src="colorFuns.js"></script>
+<script>
+var pageHeight = document.body.clientHeight;
+var pageWidth = document.body.clientWidth;
+var canvas = get("canvas");
+var ctx = canvas.getContext("2d");
+ctx.canvas.height = pageHeight;
+ctx.canvas.width = pageWidth;
+var cam = new Camera();
+var stars = [];
+var keys = [];
+var mouseX = 0;
+var mouseY = 0;
+var stopped = false;
+drawAll();
+blackCanvas();
+alert("Click to toggle between WASD control and mosue control");
+
+function get(id)
+{
+	return document.getElementById(id);	
+}
+
+function getClasses(clas)
+{
+	return document.getElementsByClassName(clas);
+}
+
+Number.prototype.mod = function(n)
+{
+	return ((this%n)+n)%n;
+}
+
+function Camera()
+{
+	this.phi = Math.PI/2;
+	this.theta = 0;
+
+	this.thetaInc = function(theta)
+	{
+		theta = theta == undefined ? 0.01 : theta;
+		this.theta = ((theta + this.theta).mod(Math.PI*2));
+	}
+
+	this.phiInc = function(phi)
+	{
+		phi = phi == undefined ? 0.01 : phi;
+		this.phi = ((phi + this.phi).mod(Math.PI*2));
+	}
+}
+
+
+function Star(phi,theta,radius)
+{
+	this.phi = phi == undefined ? Math.PI/2 : phi;
+	this.theta = theta == undefined ? 0 : theta;
+	this.radius = radius == undefined ? 25 : radius;
+	this.color = randomColor();
+	this.starRadius = 50;
+	// this.scale = (pageWidth/4)/Math.sin(Math.PI/6);
+	this.scale = 250;
+
+	this.draw = function()
+	{
+		if(this.radius == 0)
+			return;
+		var distance = (((roundToDeg(this.theta)-roundToDeg(cam.theta))%360+360)%360 > ((roundToDeg(cam.theta)-roundToDeg(this.theta))%360+360)%360 ? ((roundToDeg(cam.theta)-roundToDeg(this.theta))%360+360)%360 : ((roundToDeg(this.theta)-roundToDeg(cam.theta))%360+360)%360);
+		if(distance > 90)
+			return;
+		if((((roundToDeg(this.phi)-roundToDeg(cam.phi))%360+360)%360 > ((roundToDeg(cam.phi)-roundToDeg(this.phi))%360+360)%360 ? ((roundToDeg(cam.phi)-roundToDeg(this.phi))%360+360)%360 : ((roundToDeg(this.phi)-roundToDeg(cam.phi))%360+360)%360) > 90)
+			return;
+		// var angle = angleBetween(this,cam);
+		// if(angleBetween(this, cam) > Math.PI/2)
+		// 	return;
+
+		var x = pageWidth/2 + Math.sin(-1*(this.theta - cam.theta))*this.scale;
+		var y = pageHeight/2 + Math.sin((this.phi - cam.phi))*this.scale;
+
+
+		// var x = pageHeight/2+ (this.theta - cam.theta)/Math.PI*this.radius*this.scale;
+		// var y = pageWidth/2 + (this.phi - cam.phi)/Math.PI*this.radius*this.scale;
+
+		drawDiscatCenter(x, y, this.starRadius/Math.abs(this.radius), this.color);
+		// drawDiscatCenter(x, y, this.starRadius/Math.abs(this.radius), "#f00");
+		
+		// ctx.font = 30*vecDist([this.x,this.y,this.z])/(50*Math.sqrt(3))+"px";
+		// ctx.font = "10px";
+		// ctx.fillStyle = "#0ff";
+		// ctx.fillText(roundToDeg(this.phi)+", "+roundToDeg(this.theta)+", "+roundToDeg(this.radius)+", "+Math.round(x-pageWidth/2)+", "+Math.round(y-pageHeight/2),x,y);
+	}
+}
+
+for(var i = 0; i < 2000; i++)
+{
+	stars.push(new Star(Math.random()*Math.PI*2,Math.random()*Math.PI*2,51-Math.round(i/20)));
+}
+stars[0] = new Star(Math.PI/2,0,10);
+stars[1] = new Star(Math.PI/2+Math.PI/10,0,10);
+stars.push(new Star(Math.PI/2+Math.PI/5,0,10));
+stars.push(new Star(Math.PI/2+Math.PI/5,Math.PI,10));
+
+function drawAll()
+{
+	blackCanvas();
+	for(i in stars)
+		stars[i].draw();
+	get("printout").innerHTML = "phi: "+roundToDeg(cam.phi)+"<br>theta: "+roundToDeg(cam.theta);
+}
+
+function angleBetween(vec1, vec2)
+{
+	return Math.acos(Math.sin(vec1.theta)*Math.sin(vec1.phi)*Math.sin(vec2.theta)*Math.sin(vec2.phi) + Math.cos(vec1.theta)*Math.sin(vec1.phi)*Math.cos(vec2.theta)*Math.sin(vec2.phi) + Math.cos(vec1.phi)*Math.cos(vec2.phi));
+}
+
+function roundToDeg(rad)
+{
+	return (Math.round(rad*180/Math.PI)%360+360)%360;
+}
+
+function keyBooleans()
+{
+	// speed++;
+	if(event.type=="keydown")
+	{
+		keys[event.which] = true;
+	}
+
+	else if(event.type == "keyup")
+	{
+		keys[event.which] = false;		
+	}
+
+	// else if(event.type == "mousedown")
+	// 	keys["mousedown"] = true;
+
+	// else if(event.type == "mouseup")
+	// 	keys["mousedown"] = false;
+	else if(event.type == "mousemove")
+	{
+		mouseX = event.x;
+		mouseY = event.y;
+	}
+	else if(event.type == "mousedown")
+		stopped = !stopped;
+}
+
+function render()
+{
+	if(!stopped)
+	{
+		cam.thetaInc(0.1*(pageWidth/2-mouseX)/pageWidth/2);
+		cam.phiInc(0.1*(mouseY - pageHeight/2)/pageHeight/2);
+	}
+	else
+	{
+		if(keys[65])
+			cam.thetaInc();
+		if(keys[68])
+			cam.thetaInc(-0.01);
+		if(keys[87])
+			cam.phiInc(-0.01);
+		if(keys[83])
+			cam.phiInc();
+	}
+
+	drawAll();
+	setTimeout(render,10);
+}
+render();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,123 @@
+<html>
+<head>
+	<style>
+	canvas
+	{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+		z-index: -3;
+	}
+	</style>
+</head>
+<body onkeydown="keyBooleans(), showKeyCode()" onkeyup="keyBooleans()" onmousemove="mouseX = event.x, mouseY = event.y">
+<div id="keyCodes"></div>
+<span style="position:absolute;height:99%;width:99%;top:0px;left:0px;text-align:center;vertical-align:middle;color:red;font-size:50pt;" id="dead"></span>
+<canvas id="canvas"></canvas>
+<script src="colorFuns.js"></script>
+<script src="drawnFunctions.js"></script>
+<script src="canvasLibrary.js"></script>
+<script>
+
+
+var keys = new Array();
+for(i=1;i<150;i++)
+	keys[i] = false;
+var leftPX = 0;
+var topPX = 0;
+var speed = 2;
+var canvas = get("canvas");
+var ctx = canvas.getContext("2d");
+ctx.canvas.height = document.body.clientHeight;
+ctx.canvas.width = document.body.clientWidth;
+
+function get(id)
+{
+	return document.getElementById(id);
+}
+
+function nothing(){}
+
+function showKeyCode()
+{
+	get("keyCodes").innerHTML = "<h1 style='color:blue;'>"+event.which+'</h1>';
+}
+
+var pyramidCursorX = 450;
+var pyramidCursorY = 250;
+var pyramidRadius = 500;
+var pyramidAngle = 0;
+var mouseX = 0;
+var mouseY = 0;
+function render()
+{
+	blackCanvas();
+
+	if(keys[65])
+	{
+		pyramidCursorX -= 1;
+	}
+	
+	if(keys[68])
+	{
+		pyramidCursorX += 1;
+	}
+
+	if(keys[87])
+	{
+		pyramidCursorY -= 1;
+	}
+
+	if(keys[83])
+	{
+		pyramidCursorY+= 1;
+	}
+
+	// pyramidCursorX = Math.cos(pyramidAngle)*pyramidRadius+450;
+	// pyramidCursorY = Math.sin(pyramidAngle)*pyramidRadius+250;
+	// pyramidAngle+=2*Math.PI/180;
+	// pyramidAngle%=360;
+
+	// make the square pyramid
+	for(i=500;i>=10;i-=10)
+	{
+		drawFillSquare(450-i/2+(pyramidCursorX-450)/i*150,250-i/2+(pyramidCursorY-250)/i*150,i,rgb(Math.round(255-255*i/500),Math.round(255-255*i/500),Math.round(255-255*i/500)),ctx);
+	}
+	pyramidRadius--;
+	// if(pyramidRadius == -1)
+	// {
+	// 	pyramidRadius = 0;
+	// 	get("dead").innerHTML = "DEAD";
+	// 	ctx.beginPath();
+	// 	ctx.moveTo(450,250);
+	// 	ctx.lineTo(mouseX,mouseY);
+	// 	ctx.closePath();
+	// 	ctx.strokeStyle = "red";
+	// 	ctx.lineWidth = 50;
+	// 	ctx.stroke();
+	// 	document.body.style.cursor = "url(../Cursors/blank.cur)";
+	// }
+
+	setTimeout(render,10);
+}
+render();
+
+function keyBooleans()
+{
+	// speed++;
+	if(event.type=="keydown")
+	{
+		keys[event.which] = true;
+	}
+
+	else if(event.type == "keyup")
+	{
+		keys[event.which] = false;		
+	}
+	// if(!(keyA || keyD || keyW || keyS))
+	// 	speed = 0;	
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,85 @@
+<html>
+<head>
+<title>Box Colors!</title>
+<style>
+div
+{
+	position: absolute;
+	width: 100px;
+	height: 100px;	
+	border-radius: 100px;
+}
+
+body
+{
+	background-color: black;
+}
+
+button
+{
+	position: absolute;
+	z-index: 2;
+}
+</style>
+</head>
+<body onmousemove="makeboox()" onclick="stompbox()" onkeydown="clear(event)">
+<!-- <button onclick="makeboox()">Add one!</button><br>
+<button onclick="stompbox()">Stop It!</button> -->
+<canvas id="canvas"></canvas>
+<script>
+var i = 0;
+var j = 0;
+var time = 1000;
+var canvas = document.getElementById('canvas');
+var ctx = canvas.getContext("2d");
+ctx.canvas.width = document.body.clientWidth-20;
+ctx.canvas.height = document.body.clientHeight-20;
+
+
+function makeboox()
+{
+	body = document.body;
+	topcolor = Math.round(event.clientY / document.body.clientHeight * 255);
+	leftcolor = Math.round(event.clientX / document.body.clientWidth * 255);
+	ctx.fillStyle = "rgb("+topcolor+","+leftcolor+","+i+")";
+	ctx.beginPath();
+	ctx.arc(event.clientX,event.clientY,50,0,2*Math.PI);
+	ctx.fill();
+}
+
+function stompbox()
+{
+	if(j==0)
+	{
+		if(i==250)
+		{
+			j=1;
+		}
+		else
+		{
+			i+=10;
+		}
+	}
+	else
+	{
+		if(i==0)
+		{
+			j=0;
+		}
+		else
+		{
+			i-=10;
+		}
+	}
+}
+
+function clear(e)
+{
+	if(e.keyCode == 32)
+	{
+		ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);	
+	}
+}
+</script>
+</body>
+</html>

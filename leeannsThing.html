@@ -1,0 +1,87 @@
+<html>
+<head>
+<style>
+	#stuff
+	{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+		z-index: 5;
+	}
+
+	#canvas
+	{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+	}
+</style>
+</head>
+<body>
+<div id="stuff">
+	<!-- <button onclick="ctx.clearRect(0,0,pageWidth,pageHeight)">Clear Canvas</button><br> -->
+	Number of points: <input type="text" id="pointsNumber" value="4"><br>
+	<button onclick="changePoints()">Change</button>
+</div>
+<canvas id="canvas"></canvas>
+<script src="canvasLibrary.js"></script>
+<script>
+var pageHeight = document.body.clientHeight;
+var pageWidth = document.body.clientWidth;
+var canvas = get("canvas");
+var ctx = canvas.getContext("2d");
+ctx.canvas.height = pageHeight;
+ctx.canvas.width = pageWidth;
+
+function get(id)
+{
+	return document.getElementById(id);	
+}
+
+function getClasses(clas)
+{
+	return document.getElementsByClassName(clas);
+}
+
+var points = [];
+for(i=0; i<9; i++)
+	points.push({x:Math.round(Math.random()*window.innerWidth),y:Math.round(Math.random()*window.innerHeight),xdir:Math.round(Math.random()*5)*(2*Math.pow(Math.round(Math.random()),2)-1),ydir:Math.round(Math.random()*5)*(2*Math.pow(Math.round(Math.random()),2)-1)});
+
+function run()
+{
+	for(i in points)
+	{
+		if(points[i].x >= window.innerWidth || points[i].x <= 0)
+			points[i].xdir *= -1;
+		if(points[i].y >= window.innerHeight || points[i].y <= 0)
+			points[i].ydir *= -1;
+
+		points[i].x += points[i].xdir;
+		points[i].y += points[i].ydir;
+	}
+
+	i = 0;
+	whiteCanvas();
+	ctx.lineWidth = 2;
+	ctx.strokeStyle = "black";
+	ctx.beginPath();
+	ctx.moveTo(points[i].x,points[i++].y);
+	for(j=0; j < (points.length-3)/2; j++)
+		ctx.bezierCurveTo(points[i].x,points[i++].y,points[i].x,points[i++].y,points[i].x,points[i].y);
+	ctx.bezierCurveTo(points[i].x,points[i++].y,points[i].x,points[i++].y,points[0].x,points[0].y);
+	ctx.closePath();
+	ctx.stroke();
+	setTimeout(run, 20);
+}
+run();
+
+function changePoints()
+{
+	var points = [];
+	for(i=0; i<parseInt(get("pointsNumber").value); i++)
+		points.push({x:Math.round(Math.random()*window.innerWidth),y:Math.round(Math.random()*window.innerHeight),xdir:Math.round(Math.random()*5)*(2*Math.pow(Math.round(Math.random()),2)-1),ydir:Math.round(Math.random()*5)*(2*Math.pow(Math.round(Math.random()),2)-1)});
+
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+<html>
+<body>
+<span id="stuff"></span>
+<script>
+function get(id)
+{
+	return document.getElementById(id);
+}
+
+for(i = 0; i < 1000; i++)
+	get("stuff").innerHTML += i+" : "+String.fromCharCode(i)+"<br>";
+</script>
+</body>
+</html>

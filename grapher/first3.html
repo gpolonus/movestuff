@@ -1,0 +1,53 @@
+<html>
+<head>
+<title>My first Three.js app</title>
+<style>
+canvas
+{ 
+	width: 100%; 
+	height: 100%; 
+}
+</style>
+</head>
+<body>
+<script src="https://rawgithub.com/mrdoob/three.js/master/build/three.js"></script>
+<script>
+// Necessary beginning stuff
+var scene = new THREE.Scene();
+//var camera = new THREE.PerspectiveCamera( field of view, aspect ratio, things nearer to the camera than this dont render, things farther from the camera than this dont render );
+var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+var renderer = new THREE.WebGLRenderer();
+renderer.setSize( window.innerWidth, window.innerHeight );
+document.body.appendChild( renderer.domElement );
+
+//Adding a cube to the scene
+var geometry = new THREE.TorusGeometry(50,20,10,30,Math.PI*2);
+// var geometry = new THREE.PlaneGeometry(1000,1000,10,10);
+// var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+var material = new THREE.MeshDepthMaterial({wireframe:true});
+var darkMaterial = new THREE.MeshBasicMaterial( { color: 0x0000ff } );
+var wireframeMaterial = new THREE.MeshBasicMaterial( { color: 0x00ee00, wireframe: true, transparent: true, linewidth: 14} );
+var cube = new THREE.Mesh( geometry,darkMaterial);
+var cube2 = new THREE.Mesh( geometry,material);
+// cube.position.y = -0.5;
+// cube.rotation.x = Math.PI / 2;
+scene.add( cube2 );
+scene.add( cube );
+//cube is set where the camera is, so we move the camera out a bit
+camera.position.z = 100;
+
+//actually make the scene able to be seen
+function render() 
+{
+	requestAnimationFrame(render);
+	cube.rotation.x += 0.05;
+	cube2.rotation.x += 0.05;
+	cube.rotation.y += 0.01;
+	cube2.rotation.y += 0.01;
+	
+	renderer.render(scene, camera);
+}
+render();
+</script>
+</body>
+</html>

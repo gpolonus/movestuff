@@ -1,0 +1,151 @@
+<html>
+<head>
+<style>
+button, textarea
+{
+	position:absolute;
+	z-index: 2;
+}
+button
+{
+	top:0px;
+	left:0px;
+}
+textarea
+{
+	top:20px;
+	left:0px;
+}
+</style>
+</head>
+<body>
+<canvas id="canvas" onclick="storeSpots(start)" ondblclick="end(points)" style="position:absolute;top:0px;left:0px;"></canvas>
+<div id="stuffdiv"><div id="buttondiv"><button id="button" onclick="startThing()">Start!</button></div>
+<form id="form" method="post" action="saveShape.php" target="_blank">
+<textarea id="textarea" name="function" onclick="this.select()"></textarea><br>
+<input type="hidden" name="functionName" value="">
+<input type="submit" value="Save Shape!">
+</form>
+</body>
+<script>
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext("2d");
+ctx.canvas.height = document.body.clientHeight-30;
+ctx.canvas.width = document.body.clientWidth-30;
+ctx.strokeStyle = 'black';
+ctx.lineWidth = 2;
+var start = false;
+var points = new Array();
+var i=0;
+
+function coordPair(x,y)
+{
+	this.x = x;
+	this.y = y;
+}
+
+function startThing()
+{
+	i=0;
+	points = new Array();
+	ctx.clearRect(0,0,document.body.clientWidth-30,document.body.clientHeight-30);
+	document.getElementById("textarea").innerHTML = '';
+	alert("Start! Doubleclick to end!");
+	start = true;
+	document.getElementById("buttondiv").innerHTML = '';
+	ctx.beginPath();
+}
+
+function storeSpots(sent)
+{
+	if(sent)
+	{
+		points[i] = new coordPair(event.clientX, event.clientY);
+		
+		if(i==0)
+			ctx.moveTo(points[i].x, points[i].y);
+		else
+		{
+			ctx.lineTo(points[i].x, points[i].y);
+			ctx.stroke();
+		}
+		i++;
+	}
+}
+
+function end(spots)
+{
+	start = false;
+
+	ctx.lineTo(points[0].x,points[0].y);
+	ctx.stroke();
+	ctx.fillStyle = "#f00";
+	ctx.fill();
+	ctx.closePath();
+	
+	// ctx.beginPath();
+	// for(j=0;j<i;j++)
+	// 	ctx.moveTo(points[j].x, points[j].y);
+	// ctx.closePath();
+	// ctx.fill();
+
+	writeFunction(spots);
+	document.getElementById("buttondiv").innerHTML = "<button onclick='startThing()'>Start Again?</button>";
+}
+
+function writeFunction(verts)
+{
+	minofX = minX(verts);
+	minofY = minY(verts);
+	max = maxX(verts) - minofX;
+	name = prompt("What will you name this function?","unnamed");
+	while(name == "null")
+	{
+		name = prompt("Please name the function.");
+	}
+	document.getElementById('form').functionName.value = name;
+	func = "function "+name+"(x,y,length,color,ctx)\n{\n\tmax = "+max+";\n\tctx.beginPath();\n\txs = [";
+	for(i=0;i<verts.length-1;i++)
+		func += (verts[i].x-minofX)+", ";
+	func += verts[verts.length-1].x-minofX + "];\n\tys = [";
+	for(i=0;i<verts.length-1;i++)
+		func += (verts[i].y-minofY)+", ";
+	func += verts[verts.length-1].y-minofY + "];\n\tctx.moveTo(x+(xs[0])*length/max, y+(ys[0])*length/max);\n\tfor(i=0;i<xs.length;i++)\n\t\tctx.lineTo(x+(xs[i])*length/max, y+(ys[i])*length/max);\n\tctx.closePath();\n\tctx.fillStyle = color;\n\tctx.fill();\n}";
+	document.getElementById("textarea").innerHTML = func;
+}
+
+function minX(coords)
+{
+	min = coords[0].x;
+	for(j=0;j<i;j++)
+	{
+		if(min > coords[j].x)
+			min = coords[j].x;
+	}
+	return min;
+}
+
+function maxX(coords)
+{
+	max = coords[0].x;
+	for(j=0;j<i;j++)
+	{
+		if(max < coords[j].x)
+			max = coords[j].x;
+	}
+	return max;
+}
+
+function minY(coords)
+{
+	min = coords[0].y;
+	for(j=0;j<i;j++)
+	{
+		if(min > coords[j].y)
+			min = coords[j].y;
+	}
+	return min;
+}
+
+</script>
+</html>

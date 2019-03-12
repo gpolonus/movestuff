@@ -1,0 +1,220 @@
+<html>
+<head>
+<style>
+	#stuff
+	{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+		z-index: 5;
+	}
+
+	#canvas
+	{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+	}
+
+	#div
+	{
+		position: absolute;
+		width: 99%;
+		top:45%;
+		text-align: center;
+		z-index: 6;
+	}
+
+	#start
+	{
+		color: black;
+		font-family: Lucida Console;
+		font-size:50px;
+		font-weight: bold;
+		display: block;
+	}
+
+	#start:hover
+	{
+		text-decoration: underline;
+		cursor: hand;
+		background: white;
+	}
+
+</style>
+<title>GRJF`S TESTING PAGE</title>
+<link rel="icon" type="image/ico" href="../freak.ico" />
+</head>
+<body>
+<div id="stuff">
+	<!-- <button onclick="ctx.clearRect(0,0,pageWidth,pageHeight)">Clear Canvas</button><br> -->
+	<button onclick="drawing = false; reset()">Reset</button><br>
+</div>
+	<div id="div"><span id="start" onclick="drawSquares();get('start').style.display='none'">Don't tread too lightly<br>The broken glass lays near you<br>Break it or be cut</span></div>
+<canvas id="canvas"></canvas>
+<script src="canvasLibrary.js"></script>
+<script src="colorFuns.js"></script>
+<script>
+var pageHeight = document.body.clientHeight;
+var pageWidth = document.body.clientWidth;
+var canvas = get("canvas");
+var ctx = canvas.getContext("2d");
+ctx.canvas.height = pageHeight;
+ctx.canvas.width = pageWidth;
+ctx.lineWidth = 2;
+ctx.strokeStyle = "black";
+function get(id)
+{
+	return document.getElementById(id);	
+}
+
+function getClasses(clas)
+{
+	return document.getElementsByClassName(clas);
+}
+
+var squareW = pageWidth/30;
+
+var squares = [[]];
+
+for(var i = 0; i < 30; i++)
+{
+	squares[i] = [];
+	for(var j = 0; j < pageHeight/squareW; j++)
+	{
+		// squares[i].push({x:Math.random()*squareW+squareW*i,y:Math.random()*squareW+squareW*j});
+		squares[i].push({x:squareW*i,y:squareW*j,w:30,h:30,a:0});
+	}
+}
+
+drawing = true;
+function drawSquares()
+{
+	// whiteCanvas();
+	blackCanvas();
+	for(var i = 0; i < 30; i++)
+	{
+		for(var j = 0; j < squares[i].length; j++)
+		{
+			corner = true;
+			if(i != 0)
+			{
+				// drawConnection(i,j,i-1,j);
+			}
+
+			if(i != 29)
+			{
+				// drawConnection(i,j,i+1,j);
+			}
+			else
+				corner = false;
+
+			if(j != 0)
+			{
+				// drawConnection(i,j,i,j-1);
+			}
+
+			if(j != squares[i].length-1)
+			{
+				// drawConnection(i,j,i,j+1);
+			}
+			else
+				corner = false;
+
+			if(drawing)
+				randomize(squares[i][j]);
+
+			if(corner)
+			{
+				ctx.globalAlpha = 0.6;
+				ctx.fillStyle = rgb(255-Math.round(255/squares.length*i),Math.round(255/squares.length*i),Math.round(255/squares[0].length*j));
+				// ctx.beginPath();
+				// ctx.arc(squares[i][j].x, squares[i][j].y, squares[i][j].r, 0, 2*Math.PI);
+				// ctx.closePath();
+				ctx.beginPath();
+				ctx.ellipse(squares[i][j].x, squares[i][j].y, squares[i][j].w/2, squares[i][j].h/2, squares[i][j].a, 0, 2*Math.PI);
+				ctx.closePath();
+				ctx.fill();
+				ctx.globalAlpha = 1;
+			}
+		}
+	}
+	if(drawing)
+		setTimeout(drawSquares,10);
+}
+
+function reset()
+{
+	whiteCanvas();
+	uns = 0;
+	for(var i = 0; i < 30; i++)
+	{
+		for(var j = 0; j < squares[i].length; j++)
+		{
+			if(i*squareW != squares[i][j].x || j*squareW != squares[i][j].y)
+			{
+				dist = Math.sqrt(Math.pow(squares[i][j].x - i*squareW,2)+Math.pow(squares[i][j].y - j*squareW,2));
+				if(dist <= 1)
+				{
+					squares[i][j] = {x:squareW*i,y:squareW*j,w:30,h:30,a:0};
+				}
+				else
+				{
+					squares[i][j].x = (i*squareW - squares[i][j].x)/dist+squares[i][j].x;
+					squares[i][j].y = (j*squareW - squares[i][j].y)/dist+squares[i][j].y;
+					// squares[i][j].r -= (squares[i][j].r-30)/dist;
+					squares[i][j].w -= (squares[i][j].w-30)/dist;
+					squares[i][j].h -= (squares[i][j].h-30)/dist;
+					squares[i][j].a -= (squares[i][j].a)/dist;
+					// if(squares[i][j].r < 30)
+					// 	squares[i][j].r = 30;
+				}
+			}
+			else
+				uns++;
+		}
+	}
+	drawSquares();
+	if(uns == squares.length*squares[0].length)
+	{
+		drawing = true;
+		get("start").style.display = "block";
+	}
+	else
+		setTimeout(reset,10);
+}
+
+function randomize(point)
+{
+	// point.x = Math.floor(point.x/squareW)*squareW + Math.random()*squareW;
+	// point.y = Math.floor(point.y/squareW)*squareW + Math.random()*squareW;
+	point.x += 3*(Math.round(Math.random())*2-1);
+	point.y += 3*(Math.round(Math.random())*2-1);
+	// if(Math.round(Math.random()*10)==0)
+	// 	point.r += Math.round(Math.random()*2);
+	if(point.w == 15)
+		point.w += Math.ceil(Math.random());
+	else
+		point.w += 2*Math.round(Math.random())-1;
+
+	if(point.h == 15)
+		point.h += Math.ceil(Math.random());
+	else
+		point.h += 2*Math.round(Math.random())-1;
+
+	point.a += (2*Math.round(Math.random())-1)*Math.PI/12;
+}
+
+function drawConnection(i,j,newI,newJ)
+{
+	ctx.beginPath();
+	ctx.moveTo(squares[i][j].x,squares[i][j].y);
+	ctx.lineTo(squares[newI][newJ].x,squares[newI][newJ].y);
+	ctx.closePath();
+	ctx.stroke();
+}
+
+// drawSquares();
+</script>
+</body>
+</html>

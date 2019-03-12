@@ -1,0 +1,631 @@
+<html>
+<head>
+<title>Graphy Thingy!</title>
+<style>
+	#div
+	{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+		width:166px;
+		z-index: 50;
+		background-color: black;
+		color :white;
+	}
+
+	canvas#canvas
+	{
+		position: absolute;
+		top: 0px;
+		left: 0px;
+		z-index:1;
+	}
+
+	*
+	{
+		font-family: Courier New;
+		cursor:default;
+	}
+</style>
+</head>
+<body>
+<div id="div">
+	<button onclick="graph.add(200,100), storeColor(graph.verts[graph.verts.length-1].color), get('color').value = graph.verts[graph.verts.length-1].color, fillColor(), graph.draw()">Add</button><br>
+	<!-- Create Edge<input type="checkbox" id="connecting"><br>
+	Remove Edge<input type="checkbox" id="removingEdge"><br> -->
+	<button id="connectMarked" onclick="graph.connectMarked()">Connect Marked</button><br>
+	<button id="removeEdgesOfMarked" onclick="graph.removeEdgesOfMarked()">Remove Edges of Marked</button><br>
+	<button id="removeMarked" onclick="graph.removeMarked()">Remove Marked</button><br>
+	<input type="button" id="removing" value="Remove Vertex" onclick="graph.remove(coloring)"><br>
+	<button onclick="graph = new Graph(), graph.draw()">Remove All</button><br>
+	<button onclick="circleUp()">Circle Up</button><br>
+	<button onclick="graph.complete()">Complete</button><br>
+	<button onclick="graph.selectAll()">Select All</button><br>
+	<input type="checkbox" id="digraph">Digraph?<br>
+	Color:<span id="colorNUm">undefined</span><br>
+	<input type="text" id="color" onblur="fillColor()" onchange="storeColor(this.value)"><br><input type="text" id="red" size="5" onblur="fillNumbers()" onchange="fillNumbers(),storeColor(get('color').value)"><input type="text" id="green" size="5" onblur="fillNumbers()" onchange="fillNumbers(),storeColor(get('color').value)"><input type="text" id="blue" size="5" onblur="fillNumbers()" onchange="fillNumbers(),storeColor(get('color').value)"><br>
+	<p id="colors"></p><br>
+	<!-- <span id="firstConnect"></span><br>
+	<span id="leftButton"></span><br>
+	<span id="shiftKey"></span> -->
+</div>
+<canvas id="canvas" onmousedown="render()" onmouseup="render()" onmousemove="render()"></canvas>
+<script>
+var canvas = get("canvas");
+var ctx = canvas.getContext("2d");
+ctx.canvas.height = document.body.clientHeight-1;
+ctx.canvas.width = document.body.clientWidth-1;
+pageWidth = document.body.clientWidth-1;
+pageHeight = document.body.clientHeight-1;
+var mouseX = 0;
+var mouseY = 0;
+var mouseXdif = 0;
+var mouseYdif = 0;
+// timing check
+// var start = new Date().getTime();
+// drawAngledFillCircle(0,0,70,Math.PI*2,randColor());
+// var end = new Date().getTime();
+// alert(end-start);
+
+// var start = new Date().getTime();
+// drawAngledFillRectangle(0,0,100,Math.PI*2,randColor());
+// var end = new Date().getTime();
+// alert(end-start);
+
+var graph = new Graph();
+var bools = new Array();
+
+function get(id)
+{
+	return document.getElementById(id);
+}
+
+function Vertex(x,y,color)
+{
+	this.x = x == undefined ? 0 : x;
+	this.y = y == undefined ? 0 : y;
+	this.id = 0;
+	this.edges = new Array();
+	this.Name = "Vertex";
+	this.color = color == undefined ? randColor() : color;
+	this.marked = false;
+	this.label = '';
+	this.parent = undefined;
+
+	this.draw = function(color)
+	{
+		color = color == undefined ? this.color : color;
+		this.color = color;
+		if(this.marked)
+		{
+			ctx.fillStyle = "black";
+			ctx.beginPath();
+			ctx.arc(this.x,this.y,34,0,Math.PI*2);
+			ctx.closePath();
+			ctx.fill();
+			ctx.fillStyle = "white";
+			ctx.beginPath();
+			ctx.arc(this.x,this.y,32,0,Math.PI*2);
+			ctx.closePath();
+			ctx.fill();
+		}
+		ctx.strokeStyle = "black";
+		// ctx.fillStyle = this.marked ? "black" : lighterColor(color,30);
+		ctx.fillStyle = lighterColor(color,30);
+		ctx.beginPath();
+		ctx.arc(this.x,this.y,30,0,Math.PI*2);
+		ctx.closePath();
+		ctx.fill();
+		ctx.lineWidth = 1;
+		// for(i=0;i<this.edges.length;i++)
+		ctx.fillStyle = "black";
+		for(i in this.edges)
+		{
+			ctx.beginPath();
+			ctx.moveTo(this.x,this.y);
+			ctx.lineTo(this.edges[i].x,this.edges[i].y);
+			ctx.closePath();
+			ctx.stroke();
+			ctx.beginPath();
+			if(get("digraph").checked)
+			{
+				slopeAng = Math.atan((this.y-this.edges[i].y)/(this.x-this.edges[i].x));
+				if(this.x <= this.edges[i].x)
+					slopeAng+=Math.PI;
+				perpAng = slopeAng+Math.PI/2;
+				midX = (this.x+this.edges[i].x)/2;
+				midY = (this.y+this.edges[i].y)/2;
+				ctx.moveTo(midX-20*Math.cos(slopeAng),midY-20*Math.sin(slopeAng));
+				ctx.lineTo(midX-10*Math.cos(perpAng), midY-10*Math.sin(perpAng));
+				ctx.lineTo(midX+10*Math.cos(perpAng), midY+10*Math.sin(perpAng));
+				ctx.closePath();
+				ctx.fill();
+			}
+		}
+		ctx.fillStyle = color;
+		ctx.beginPath();
+		ctx.arc(this.x,this.y,20,0,Math.PI*2);
+		ctx.closePath();
+		ctx.fill();
+	};
+
+	this.connect = function(vert)
+	{
+		switch(typeof(vert))
+		{
+			case 'number':
+				if(this.parent == undefined)
+					return;
+				else
+					vert = this.parent.verts[vert];
+			break;
+			case 'undefined':
+				return;
+			break;
+		}
+		if(vert.id == this.id)
+			return;
+		if(this.edges[vert.id] != undefined)
+			return;
+		this.edges[vert.id] = vert;
+		vert.edges[this.id] = this;
+	};
+
+	this.drawTop = function()
+	{
+		ctx.fillStyle = this.color;
+		ctx.beginPath();
+		ctx.arc(this.x,this.y,20,0,Math.PI*2);
+		ctx.closePath();
+		ctx.fill();
+	}
+
+	this.remove = function()
+	{
+		for(vert in this.edges)
+		{
+			delete this.edges[vert].edges[this.id];
+		}
+	}
+}
+
+function Graph(verts)
+{
+	this.verts = verts == undefined ? new Array() : verts;
+	this.count = 0;
+	this.marked = new Array();
+
+	this.createBoard = function(){
+		var board = [];
+		for(var i in this.verts){
+			var vert = this.verts[i];
+			var newSpace = {
+				type: vert.color,
+				id: vert.id,
+				x: vert.x,
+				y: vert.y,
+				nbs: []
+			};
+			board.push(newSpace);
+			for(var j in vert.edges){
+				var edgeVert = vert.edges[j];
+				newSpace.nbs.push(edgeVert.id);
+			}
+		}
+		return JSON.stringify(board);
+	}
+
+	this.add = function(x,y)
+	{
+		x = x == undefined ? 0 : x;
+		y = y == undefined ? 0 : y;
+		this.verts.push(new Vertex(x,y));
+		this.verts[this.verts.length-1].label = this.verts.length-1;
+		this.verts[this.verts.length-1].id = this.verts.length-1;
+		this.verts[this.verts.length-1].parent = this;
+		this.count++;
+	}
+
+	this.connect = function(one,two)
+	{
+		if(one == two)
+			return;
+		if(this.verts.length < 2)
+			return false;
+		this.verts[one].connect(this.verts[two]);
+	}
+
+	this.draw = function()
+	{
+		ctx.clearRect(0,0,pageWidth,pageHeight);
+		// for(ops = 0; ops < this.verts.length; ops++)
+		for(ops in this.verts)
+			this.verts[ops].draw();
+		// for(ops = 0; ops < this.verts.length; ops++)
+		for(ops in this.verts)
+			this.verts[ops].drawTop();
+	}
+
+	this.whichVertex = function(x,y)
+	{
+		// for(erf = 0; erf < graph.verts.length; erf++)
+		for(erf in graph.verts)
+		{
+			if(Math.sqrt(Math.pow(graph.verts[erf].x-x,2)+Math.pow(graph.verts[erf].y-y,2))<20)
+			{
+				return erf;
+			}
+		}
+		return -1;
+	}
+
+	this.get = function(num)
+	{
+		return this.verts[num];
+	}
+
+	this.remove = function(id)
+	{
+		graph.verts[id].remove();
+		delete graph.verts[id];
+		graph.draw();
+		this.count--;
+	}
+
+	this.removeEdge = function(one, two)
+	{
+		delete graph.verts[one].edges[two];
+		delete graph.verts[two].edges[one];
+	};
+
+	this.complete = function()
+	{
+		for(blip in this.verts)
+			for(blop in this.verts)
+				this.verts[blip].connect(this.verts[blop]);
+		graph.draw();
+	};
+
+	this.unmarkAll = function()
+	{
+		for(urf in this.verts)
+		{
+			this.verts[urf].marked = false;
+		}
+		this.marked = new Array();
+	};
+
+	this.unmark = function(num)
+	{
+		this.verts[num].marked = false;
+		this.marked.splice(this.marked.indexOf(num),1);
+	};
+
+	this.mark = function(num)
+	{
+		this.verts[num].marked = true;
+		if(this.marked.indexOf(num) == -1)
+			this.marked.push(num);
+	};
+
+	this.removeEdgesOfMarked = function()
+	{
+		for(blip in this.marked)
+			for(blop in this.marked)
+				this.removeEdge(this.marked[blip],this.marked[blop]);
+		graph.draw();
+	};
+
+	this.connectMarked = function()
+	{
+		for(blip in this.marked)
+			for(blop in this.marked)
+				this.connect(this.marked[blip],this.marked[blop]);
+		graph.draw();
+	}
+
+	this.removeMarked = function()
+	{
+		for(blop in this.marked)
+			this.remove(this.marked[blop]);
+		graph.draw();
+	}
+
+	this.changeColor = function(color)
+	{
+		for(blip in this.marked)
+			this.verts[this.marked[blip]].color = color;
+	}
+
+	this.selectAll = function()
+	{
+		for(balls in this.verts)
+			this.mark(balls);
+		graph.draw();
+	}
+
+	this.countEdges = function()
+	{
+		num = 0;
+		for(balls in this.verts)
+		{
+			for(dicks in this.verts[balls].edges)
+				if(this.verts[balls].edges[dicks])
+					num++;
+			console.log(num);
+		}
+		return num/2;
+	}
+
+	this.areConnected = function(one,two)
+	{
+		// return this.get(one).edges.indexOf(graph.get(two).id) != -1 || this.get(two).edges.indexOf(graph.get(one).id) != -1;
+		first = false;
+		secon = false;
+		for(var blip in this.get(two).edges)
+			if(this.get(two).edges[blip].id == one)
+				first = true;
+		for(var blip in this.get(one).edges)
+			if(this.get(one).edges[blip].id == two)
+				secon = true;
+		return first || secon;
+	}
+
+	this.adjacencyMatrix = function()
+	{
+		adj = [];
+		for(var i = 0; i < this.verts.length; i++)
+		{
+			adj[i] = [];
+			for(var j = 0; j < this.verts.length; j++)
+				adj[i].push(0);
+		}
+
+		for(var i = 0; i < this.verts.length; i++)
+		{
+			for(var j = 0; j < this.verts[i].edges.length; j++)
+				if(this.verts[i].edges[j] != undefined)
+					adj[i][j] = 1;
+		}
+
+		return adj;
+	}
+}
+
+var firstConnect = -1;
+var holding = -1;
+var coloring = -1;
+function render()
+{
+	if(event.type == 'mousedown' && event.which == 1)
+	{
+		// if((get("connecting").checked || event.shiftKey) && firstConnect == -1)
+		// {
+		// 	get("connecting").checked = true;
+		// 	thing = graph.whichVertex(event.x,event.y);
+		// 	if(thing != -1)
+		// 	{
+		// 		graph.mark(thing);
+		// 		firstConnect = thing;
+		// 	}
+		// }
+		// else if((get("connecting").checked || event.shiftKey) && firstConnect >= 0)
+		// {
+		// 	thing = graph.whichVertex(event.x,event.y);
+		// 	if(thing != -1 && thing != firstConnect)
+		// 	{
+		// 	get("connecting").checked = false;
+		// 		graph.unmark(thing);
+		// 		graph.unmark(firstConnect);
+		// 		graph.connect(firstConnect,thing);
+		// 		firstConnect = -1;
+		// 	}
+		// }
+		// else if(get("removingEdge").checked && firstConnect < 0)
+		// {
+		// 	thing = graph.whichVertex(event.x,event.y);
+		// 	if(thing!=-1)
+		// 	{
+		// 		firstConnect = thing;
+		// 		graph.get(thing).marked = true;
+		// 	}
+		// }
+		// else if(get("removingEdge").checked && firstConnect >= 0)
+		// {
+		// 	thing = graph.whichVertex(event.x,event.y);
+		// 	if(thing != -1 && firstConnect != thing)
+		// 	{
+		// 		get("removingEdge").checked = false;
+		// 		graph.removeEdge(thing,firstConnect);
+		// 		graph.get(firstConnect).marked = false;
+		// 		firstConnect = -1;
+		// 	}
+		// }
+		if(event.ctrlKey)
+		{
+			thing = graph.whichVertex(event.x,event.y);
+			if(graph.marked.length == 1 && thing != -1)
+			{
+				if(graph.areConnected(graph.marked[0],thing))
+					graph.removeEdge(graph.marked[0],thing);
+				else
+					graph.connect(graph.marked[0], thing);
+			}
+
+		}
+		else if(event.shiftKey)
+		{
+			thing = graph.whichVertex(event.x,event.y);
+			if(thing != -1 && graph.marked.indexOf(thing) == -1)
+				graph.mark(thing);
+		}
+		else if(holding < 0)
+		{
+			erf = graph.whichVertex(event.x,event.y);
+			if(erf != -1)
+			{
+				mouseYdif = event.y-graph.get(erf).y;
+				mouseXdif = event.x-graph.get(erf).x;
+				holding = erf;
+				coloring = erf;
+				graph.unmarkAll();
+				graph.mark(erf);
+				get("colorNUm").innerHTML = erf;
+
+			}
+			else
+			{
+				coloring = -1;
+				holding = -1;
+				get("colorNUm").innerHTML = -1;
+				graph.unmarkAll();
+			}
+		}
+		else
+		{
+		}
+	}
+	else if (event.type == 'mousemove' && holding >= 0)
+	{
+		graph.verts[holding].x = event.x - mouseXdif;
+		graph.verts[holding].y = event.y - mouseYdif;
+	}
+	else if(event.type == 'mouseup')
+		holding = -1;
+
+	graph.draw();
+	// setTimeout(render,10);
+}
+
+function circleUp()
+{
+	k = Object.keys(graph.verts).length;
+	l = 0;
+	for(bob in graph.verts)
+	{
+		graph.verts[bob].x = pageWidth/2 + Math.cos(2*l*Math.PI/k)*pageHeight/2;
+		graph.verts[bob].y = pageHeight/2 - Math.sin(2*l*Math.PI/k)*pageHeight/2;
+		l++;
+	}
+	graph.draw();
+}
+
+function numToHex(num)
+{
+	hexNum = '';
+	modding = 1;
+	do
+	{
+		tempModding = modding * 16;
+		place = (num % tempModding)/modding;
+		if(place >= 10)
+			hexNum = String.fromCharCode(place + 55)+hexNum;
+		else
+			hexNum = place+hexNum;
+		num -= place*modding;
+		modding *= 16;
+	} while(num >= modding)
+	return hexNum;
+}
+
+function hexToDec(num)
+{
+	num = num.toUpperCase();
+	sum = 0;
+	for(i=num.length-1;i>=0;i--)
+	{
+		place = num.substr(i,1);
+		if(parseInt(place) < 10)
+			sum += parseInt(place)*Math.pow(16,num.length-1-i);
+		else
+			sum += (place.charCodeAt(0)-55)*Math.pow(16,num.length-1-i);
+	}
+	return sum;
+}
+
+function decToAny(num,base)
+{
+	if(base == 10)
+		return num;
+	hexNum = '';
+	modding = 1;
+	do
+	{
+		tempModding = modding * base;
+		place = (num % tempModding)/modding;
+		if(place >= 10)
+			hexNum = String.fromCharCode(place + 55)+hexNum;
+		else
+			hexNum = place+hexNum;
+		num -= place*modding;
+		modding *= base;
+	} while(num >= modding)
+	return hexNum;
+}
+
+function rgb(r,g,b)
+{
+	red = numToHex(r);
+	red = red.length == 1 ? 0+red : red;
+	green = numToHex(g);
+	green = green.length == 1 ? 0+green : green;
+	blue = numToHex(b);
+	blue = blue.length == 1 ? 0+blue : blue;
+	color = '#'+red+green+blue;
+	if(color.includes('.'))
+		console.log("Error: "+color);
+	return color;
+}
+
+function lighterColor(color,amount)
+{
+	return rgb(stayUnder(hexToDec(color.substr(1,2))+amount,255),stayUnder(hexToDec(color.substr(3,2))+amount,255),stayUnder(hexToDec(color.substr(5,2))+amount,255));
+}
+
+function randColor()
+{
+	return rgb(Math.round(Math.random()*255),Math.round(Math.random()*255),Math.round(Math.random()*255));
+}
+
+function stayUnder(num,cap)
+{
+	return num > cap ? cap : num;
+}
+
+function fillColor()
+{
+	if(get("color").value[0] != '#')
+		get("color").value = '#'+get("color").value;
+	get("red").value = hexToDec(get("color").value.substr(1,2));
+	get("green").value = hexToDec(get("color").value.substr(3,2));
+	get("blue").value = hexToDec(get("color").value.substr(5,2));
+}
+
+function fillNumbers()
+{
+	get("color").value = rgb(get("red").value,get("green").value,get("blue").value);
+}
+
+var storedColorsNum = 0;
+function storeColor(color)
+{
+	storedColorsNum++;
+	colorNum = 1*get("red").value+1*get("blue").value+1*get("green").value;
+	if(colorNum < 300)
+		// get("colors").innerHTML += "<span style='background-color:"+color+";color:white;' onclick='graph.verts[coloring].color = \""+color+"\", get(\"color\").value=\""+color+"\", fillColor(), graph.draw()'>"+color+"</span>";
+		get("colors").innerHTML += "<span style='background-color:"+color+";color:white;' onclick='graph.changeColor(\""+color+"\"), get(\"color\").value=\""+color+"\", fillColor(), graph.draw()'>"+color+"</span>";
+	else
+		get("colors").innerHTML += "<span style='background-color:"+color+";color:black;' onclick='graph.changeColor(\""+color+"\"), get(\"color\").value=\""+color+"\", fillColor(), graph.draw()'>"+color+"</span>";
+	if(storedColorsNum%3 == 0)
+		get("colors").innerHTML += "<br>";
+	fixColors(color);
+}
+
+function fixColors(color)
+{
+	get("color").value = color;
+	fillColor();
+}
+</script>
+</body>
+</html>
