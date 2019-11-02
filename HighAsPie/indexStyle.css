@@ -1,6 +1,9 @@
 /** { box-sizing: border-box; }*/
 
-body { font-family: Courier New; }
+body {
+	font-family: Courier New;
+	background-position: center;
+}
 
 /* ---- grid ---- */
 
@@ -10,7 +13,7 @@ body { font-family: Courier New; }
 	text-align: center;
 }
 
-.grid 
+.grid
 {
 	/*max-width: 1200px;*/
 }

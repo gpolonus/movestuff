@@ -19,10 +19,19 @@
 <title>GRJF`S TESTING PAGE</title>
 <link rel="icon" type="image/ico" href="freak.ico" />
 </head>
-<body onkeydown="keyBooleans()" onkeyup="keyBooleans()" onmousedown="keyBooleans()" onmousemove="keyBooleans()" onmouseup="keyBooleans()">
+<body
+	onkeydown="keyBooleans()"
+	onkeyup="keyBooleans()"
+	onmousedown="keyBooleans()"
+	onmousemove="keyBooleans()"
+	onmouseup="keyBooleans()"
+>
 <div id="stuff">
 	<!-- <button onclick="ctx.clearRect(0,0,pageWidth,pageHeight)">Clear Canvas</button><br> -->
-	<form id="form" action="saveCanvas.php" method="post"><input type="hidden" name="picture"><button type="button" onclick="save()">Save Canvas</button></form>
+	<form id="form" action="saveCanvas.php" method="post">
+		<input type="hidden" name="picture">
+		<button type="button" onclick="save()">Save Canvas</button>
+	</form>
 </div>
 <canvas id="canvas"></canvas>
 <script src="canvasLibrary.js"></script>
@@ -46,7 +55,7 @@ blackCanvas();
 
 function get(id)
 {
-	return document.getElementById(id);	
+	return document.getElementById(id);
 }
 
 function getClasses(clas)
@@ -69,7 +78,7 @@ function drawAll()
 		prevPoints.push({x: pageWidth - mouseX, y: mouseY});
 		prevPoints.push({x: pageWidth - mouseX, y: pageHeight - mouseY});
 		prevPoints.push({x: mouseX, y: pageHeight - mouseY});
-		
+
 		// first = false;
 	}
 	else
@@ -107,7 +116,7 @@ function keyBooleans()
 
 	else if(event.type == "keyup")
 	{
-		keys[event.which] = false;		
+		keys[event.which] = false;
 	}
 
 	// else if(event.type == "mousedown")
