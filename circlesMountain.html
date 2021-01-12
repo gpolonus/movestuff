@@ -1,16 +1,14 @@
 <html>
 	<head>
 		<style>
-			#stuff
-			{
+			#stuff {
 				position: absolute;
 				top: 0px;
 				left: 0px;
 				z-index: 5;
 			}
 
-			#canvas
-			{
+			#canvas {
 				position: absolute;
 				top: 0px;
 				left: 0px;
@@ -46,50 +44,77 @@
 			ctx.strokeStyle = "white";
 			blackCanvas();
 
-			function get(id) {
+			function get(id)
+			{
 				return document.getElementById(id);	
 			}
 
-			function getClasses(clas) {
+			function getClasses(clas)
+			{
 				return document.getElementsByClassName(clas);
 			}
 
-			function write(stuff) {
+			function write(stuff)
+			{
 				get("stuff").innerHTML = stuff;
 			}
 
-			function save() {
+			function save()
+			{
 				get("form").picture.value = canvas.toDataURL();
 				get("form").submit();
 			}
 
-			function drawAll() {
-				
-			}
+			const len = ([x, y]) => Math.sqrt(Math.pow(mouseX - x, 2) + Math.pow(mouseY - y, 2));
 
-			function keyBooleans() {
+			const orderCircles = () => circles = circles.sort((a, b) => len(b) - len(a));
+
+			const numberOfCircles = 200;
+			const circleRadius = 100;
+			let circles = Array(numberOfCircles).fill().map(() => [
+				Math.round(Math.random() * pageWidth),
+				Math.round(Math.random() * pageHeight)
+			]);
+			orderCircles();
+			const twoPI = 2 * Math.PI;
+			function drawAll() {
+				ctx.fillStyle = 'white';
+				ctx.strokeStyle = 'black';
+				ctx.lineWidth = 2;
+				circles.forEach(([x, y]) => {
+					ctx.beginPath();
+					ctx.arc(x, y, circleRadius, 0, twoPI);
+					ctx.fill();
+					ctx.stroke();
+				});
+			}
+			drawAll();
+
+			function keyBooleans()
+			{
 				if (event.type=="keydown") {
 					keys[event.which] = true;
 				} else if (event.type == "keyup") {
 					keys[event.which] = false;		
-				} else if (event.type == "mousemove") {
+				} else if (event.type == "mouseup") {
 					mouseX = event.x;
 					mouseY = event.y;
-				} else if (event.type == "mousedown") {
-					// stopped = !stopped;
+					orderCircles();
+					drawAll();
 				}
 			}
 
 			function render() {
 				if (!stopped) {
 					drawAll();
-					window.requestAnimationFrame(render);
 				} else {
 
 				}
+
+				// window.requestAnimationFrame(render);
 			}
 
-			window.requestAnimationFrame(render);
+			// window.requestAnimationFrame(render);
 
 		</script>
 	</body>
